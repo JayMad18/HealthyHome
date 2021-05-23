@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">HealthyHome Alpha</string>
+    <string name="bottem_nav_home">Home</string>
+    <string name="bottem_nav_settings">Settings</string>
+    <string name="bottem_nav_logout">Logout</string>
+    <string name="bottem_nav_back">Back</string>
+    <string name="top_left_button">My Tasks</string>
+    <string name="top_right_button">All Tasks</string>
+    <string name="bottom_left_button">Add Task</string>
+    <string name="bottom_right_button">Members</string>
+
+
+    <integer name="layout_margin_top">20</integer>
+
+    <string name="back4app_server_url">https://parseapi.back4app.com/</string>
+    <string name="back4app_app_id">vwMLMU9rlgYaJLIOo8PEs79D3y52OD8irqJhVq31</string>
+    <string name="back4app_client_key">5quX9z5ToslT9etuCFtX9O8lYCpjJE2RQSubl4dO</string>
+</resources>
