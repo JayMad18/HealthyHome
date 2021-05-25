@@ -34,7 +34,7 @@ import java.util.List;
 public class ViewHome extends AppCompatActivity {
     ParseObject foundHomeObject;
     ArrayList<String> memberNames = new ArrayList<String>();
-    TextView homeNameView, homeIdView, dateCreatedView, lastUpdateView, numberOfMembersView, numberOfTasksView;
+    TextView homeNameView, homeIdView, numberOfMembersView, numberOfTasksView;
     BottomNavigationView bottomNavigationView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
