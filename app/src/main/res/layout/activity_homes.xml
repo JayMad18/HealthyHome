@@ -90,6 +90,7 @@
         android:background="@drawable/rounded_edit_text"
         android:gravity="center"
         android:text="My Homes"
+        android:onClick="showUsersHomes"
         android:textColor="@color/GhostWhite"
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
