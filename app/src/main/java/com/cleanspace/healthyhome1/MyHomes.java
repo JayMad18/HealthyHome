@@ -20,7 +20,7 @@ import java.util.List;
 
 public class MyHomes extends AppCompatActivity {
 ListView myHomesListView;
-ArrayList<String> homeObjects;
+ArrayList<String> homeObjects = new ArrayList<String>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,10 +35,22 @@ ArrayList<String> homeObjects;
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
                 if(e == null){
-                    for(ParseObject object: objects){
-                        homeObjects.add(object.getString("HomeName"));
+                    if(ParseUser.getCurrentUser() == null){
+                        Toast.makeText(getApplicationContext(),"getCurrentUser = null", Toast.LENGTH_SHORT).show();
+                        Log.i("user = null", e.getLocalizedMessage());
                     }
-                    populateListView();
+                    else if(objects == null){
+                        Toast.makeText(getApplicationContext(),"returned objects list = null", Toast.LENGTH_SHORT).show();
+                        Log.i("objects = null", e.getLocalizedMessage());
+                    }
+                    else{
+                        Log.i("objects list size", Integer.toString(objects.size()));
+                        for(ParseObject object: objects){
+                            homeObjects.add(object.getString("HomeName"));
+
+                        }
+                        populateListView();
+                    }
                 }
                 else{
                     Log.i("Error loading homes into memberObjects arraylist", e.getLocalizedMessage());
@@ -48,7 +60,7 @@ ArrayList<String> homeObjects;
         });
     }
     public void populateListView(){
-        ArrayAdapter<String> memberObjectsAdapter = new ArrayAdapter<String>(this, R.layout.list_layout,homeObjects);
+        ArrayAdapter<String> memberObjectsAdapter = new ArrayAdapter<String>(this, R.layout.list_layout, R.id.list_content,homeObjects);
         memberObjectsAdapter.notifyDataSetChanged();
         myHomesListView.setAdapter(memberObjectsAdapter);
     }
