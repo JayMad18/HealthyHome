@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -30,10 +31,11 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 //Hello development branch!
+//Hello im development branch and I come from the remote repository!
 public class ViewHome extends AppCompatActivity {
     ParseObject foundHomeObject;
     ArrayList<String> memberNames = new ArrayList<String>();
-    TextView homeNameView, homeIdView, dateCreatedView, lastUpdateView, numberOfMembersView, numberOfTasksView;
+    TextView homeNameView, homeIdView, numberOfMembersView, numberOfTasksView;
     BottomNavigationView bottomNavigationView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -193,6 +195,12 @@ public class ViewHome extends AppCompatActivity {
                 }else{
                     Log.i("Error updating listview", e.getLocalizedMessage());
                 }
+            }
+        });
+        membersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(getApplicationContext(), memberNames.get(position), Toast.LENGTH_SHORT).show();
             }
         });
     }
