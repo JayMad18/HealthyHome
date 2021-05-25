@@ -55,8 +55,6 @@ public class ViewHome extends AppCompatActivity {
     public void getHome(String homeId){
          homeNameView = findViewById(R.id.homeNameTextView);
          homeIdView = findViewById(R.id.homeIdTextView);
-         dateCreatedView = findViewById(R.id.dateCreatedTextView);
-         lastUpdateView = findViewById(R.id.lastUpdateTextView);
 
         //Getting the home by querying Id
         //Replace with homeIdQuery.getFirstInBackground(new GetCallBack<ParseObject>() {...});
@@ -76,8 +74,7 @@ public class ViewHome extends AppCompatActivity {
 
                     homeNameView.setText("Home Name: " + foundHomeObject.get("HomeName").toString());
                     homeIdView.setText("Home Id: " + foundHomeObject.get("ID").toString());
-                    dateCreatedView.setText("Date Created: " + foundHomeObject.getCreatedAt().toString());
-                    lastUpdateView.setText("Last time updated: " + foundHomeObject.getUpdatedAt().toString());
+
 
                     populateMemberAndTaskViews(foundHomeObject.get("ID").toString());
 
