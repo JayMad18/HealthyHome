@@ -9,6 +9,34 @@
 	to promote a shared effort in the upkeep of daily tasks as if the space was their
 	home.
 	
+	Mainly useful:
+	*Any type of shared dormatory.
+	*Family homes.
+	*Roommates.
+
+        Possibly useful for:
+	*Resturant crews.
+	*Shared office or office's.
+	*Prison dorms by inmates via kiosk
+	*As a tool for a variety of different work crews.
+	*Many more...
+	
+	Required functionalities:
+	: ability to create a Home.
+	: ability to add and remove tasks.
+	: ability to add and remove members.
+	: ability to assign member/members to specific task/task's.
+	: task's can usually be self assigned if not already assigned.
+	: members of a Home are all viewable to other members.
+	: members can also interact with other users of same Home
+		such as approving, disapproving, and assiging tasks to 
+		other users.
+	: any member can select a "Unavailabe" type setting that 
+		prevents member from being assigned tasks, also
+		notifies other members of unavalability.
+	: all Homes have a unique ID.
+	
+	******IMPORTANT******
 	When attempting to contribute please create a temporary branch from the development branch
 	and then create pull request to merge your contribution to the development branch.
 	
