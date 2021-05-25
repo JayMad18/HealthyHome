@@ -125,4 +125,8 @@ public class Homes extends AppCompatActivity {
         Intent switchActivity = new Intent(getApplicationContext(), activity);
         startActivity(switchActivity);
     }
+
+    public void showUsersHomes(View view){
+        changeActivity(MyHomes.class);
+    }
 }
