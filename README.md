@@ -13,3 +13,8 @@
 	
 	The development branch will be merged with the Master branch after carefull consideration 
 	of the most useful contributions to be added.
+	
+	Please feel free to email or contact me about any questions so that you may better understand what is going on!
+	Personal number:229-230-0531
+	Dev email: javariousdev@gmail.com
+	facebook: sarutobi madison
