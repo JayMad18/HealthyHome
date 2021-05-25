@@ -1,4 +1,4 @@
-# HH2
+# Healthy Home
 
 
 	An application to allow users to easily track, plan, assign, and notify 
