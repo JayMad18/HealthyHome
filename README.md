@@ -21,6 +21,7 @@
 	facebook: sarutobi madison
 	
 Screenshots of progress down below!
+P.S. I know the app does not look visually appealing right now but UI upgrades will come after all functionality is complete.
 
 ![Screenshot_20210525-140659](https://user-images.githubusercontent.com/48261938/119548413-30522080-bd64-11eb-9f59-cfc253789674.png)![Screenshot_20210525-140826 (1)](https://user-images.githubusercontent.com/48261938/119548891-b0788600-bd64-11eb-8e32-90c0fd005db5.png)
 ![Screenshot_20210525-140807](https://user-images.githubusercontent.com/48261938/119548893-b0788600-bd64-11eb-9e9e-7fce4c9b5d70.png)
