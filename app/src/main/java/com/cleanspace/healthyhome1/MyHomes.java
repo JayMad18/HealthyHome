@@ -1,13 +1,17 @@
 package com.cleanspace.healthyhome1;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.FindCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
@@ -21,12 +25,24 @@ import java.util.List;
 public class MyHomes extends AppCompatActivity {
 ListView myHomesListView;
 ArrayList<String> homeObjects = new ArrayList<String>();
+BottomNavigationView bottomNavigationView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_homes);
         myHomesListView = findViewById(R.id.myHomesListView);
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
         loadHomes();
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+                if(item.getItemId() == (R.id.backItem)){
+                    changeActivity(Homes.class);
+                }
+                return false;
+            }
+        });
     }
     public void loadHomes(){
         ParseQuery<ParseObject> homeQuery = ParseQuery.getQuery("Homes");
@@ -63,5 +79,9 @@ ArrayList<String> homeObjects = new ArrayList<String>();
         ArrayAdapter<String> memberObjectsAdapter = new ArrayAdapter<String>(this, R.layout.list_layout, R.id.list_content,homeObjects);
         memberObjectsAdapter.notifyDataSetChanged();
         myHomesListView.setAdapter(memberObjectsAdapter);
+    }
+    public void changeActivity(Class activity){
+        Intent switchActivity = new Intent(getApplicationContext(), activity);
+        startActivity(switchActivity);
     }
 }
