@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -27,7 +29,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class HomeScreen extends AppCompatActivity {
     TextView quoteView;
-    BottomNavigationView logout;
+    BottomNavigationView bottomNavigationView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,25 +38,37 @@ public class HomeScreen extends AppCompatActivity {
         setLogoutListener();
     }
     public void setLogoutListener(){
-        logout = findViewById(R.id.bottom_navigation);
-        logout.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 if(item.getItemId() == R.id.logoutItem){
-                    ParseUser.logOutInBackground(new LogOutCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            if(e == null){
-                                Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
-                                changeActivity(MainActivity.class);
-                            }else{
-                                Log.i("ERROR!!!!!!", e.getLocalizedMessage());
-                                Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
+                   logoutAlertDialog();
                 }
                 return false;
+            }
+        });
+    }
+    public void logoutAlertDialog(){
+        new AlertDialog.Builder(this).setTitle("Log out").setMessage("Are you sure you want to log out?")
+                .setIcon(android.R.drawable.ic_media_previous).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                logout();
+            }
+        }).setNegativeButton("No", null).show();
+    }
+    public void logout(){
+        ParseUser.logOutInBackground(new LogOutCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e == null){
+                    Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
+                    changeActivity(MainActivity.class);
+                }else{
+                    Log.i("ERROR!!!!!!", e.getLocalizedMessage());
+                    Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

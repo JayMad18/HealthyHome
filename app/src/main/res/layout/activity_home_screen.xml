@@ -64,7 +64,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="A random quote will go here -Jay Madison"
-        android:textColor="@color/GhostWhite"
+        android:textColor="@color/Pink"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

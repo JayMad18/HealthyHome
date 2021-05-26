@@ -35,6 +35,9 @@ BottomNavigationView bottomNavigationView;
         myHomesListView = findViewById(R.id.myHomesListView);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         loadHomes();
+        bottomNavListener();
+    }
+    public void bottomNavListener(){
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -45,8 +48,6 @@ BottomNavigationView bottomNavigationView;
                 return false;
             }
         });
-
-
     }
     public void loadHomes(){
         ParseQuery<ParseObject> homeQuery = ParseQuery.getQuery("Homes");
@@ -83,10 +84,13 @@ BottomNavigationView bottomNavigationView;
         ArrayAdapter<String> memberObjectsAdapter = new ArrayAdapter<String>(this, R.layout.list_layout, R.id.list_content,homeObjects);
         memberObjectsAdapter.notifyDataSetChanged();
         myHomesListView.setAdapter(memberObjectsAdapter);
+        listViewItemClickListener();
+    }
+    public void listViewItemClickListener(){
         myHomesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //TODO here is where code to display selected "Home" home page.
+                changeActivity(HomeScreen.class);
                 Toast.makeText(getApplicationContext(), homeObjects.get(position), Toast.LENGTH_SHORT).show();
             }
         });
