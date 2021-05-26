@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -43,6 +45,8 @@ BottomNavigationView bottomNavigationView;
                 return false;
             }
         });
+
+
     }
     public void loadHomes(){
         ParseQuery<ParseObject> homeQuery = ParseQuery.getQuery("Homes");
@@ -79,6 +83,13 @@ BottomNavigationView bottomNavigationView;
         ArrayAdapter<String> memberObjectsAdapter = new ArrayAdapter<String>(this, R.layout.list_layout, R.id.list_content,homeObjects);
         memberObjectsAdapter.notifyDataSetChanged();
         myHomesListView.setAdapter(memberObjectsAdapter);
+        myHomesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //TODO here is where code to display selected "Home" home page.
+                Toast.makeText(getApplicationContext(), homeObjects.get(position), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
     public void changeActivity(Class activity){
         Intent switchActivity = new Intent(getApplicationContext(), activity);

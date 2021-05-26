@@ -71,12 +71,18 @@ public class Homes extends AppCompatActivity {
             public void done(List<ParseObject> objects, ParseException e) {
                 if(e == null){
 
-                    Toast.makeText(getApplicationContext(),"Home or Homes found matching ID", Toast.LENGTH_SHORT).show();
                     String foundHome = "";
-                    foundHomeObject = objects.get(0);
-                    for(ParseObject object: objects){
-                        foundHome += object.getString("HomeName") + "\n";
+
+                    if(objects.size() > 0){
+                        foundHomeObject = objects.get(0);
                     }
+                    else{
+                        Toast.makeText(getApplicationContext(),"No home found by that ID", Toast.LENGTH_SHORT).show();
+                    }
+
+
+                        foundHome += objects.get(0).getString("HomeName") + "\n";
+
                     resultsView.setText(foundHome);
                     resultsView.setVisibility(View.VISIBLE);
                 }
