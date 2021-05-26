@@ -11,18 +11,25 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.LogOutCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 import java.util.Scanner;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -30,13 +37,50 @@ import javax.net.ssl.HttpsURLConnection;
 public class HomeScreen extends AppCompatActivity {
     TextView quoteView;
     BottomNavigationView bottomNavigationView;
+    ParseObject selectedHome;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
+        Intent sentHome = getIntent();
         generateQuote();
         setLogoutListener();
+
+        ParseQuery selectedHomeQuery = ParseQuery.getQuery("Homes");
+        selectedHomeQuery.whereEqualTo("objectId", sentHome.getStringExtra("HomeObjectID"));
+        selectedHomeQuery.getFirstInBackground(new GetCallback() {
+            @Override
+            public void done(ParseObject object, ParseException e) { }
+
+            @Override
+            public void done(Object o, Throwable throwable) {
+                if(throwable == null){
+                    if(o == null){
+                        Toast.makeText(getApplicationContext(),"No Home Found", Toast.LENGTH_SHORT).show();
+                    }else{
+                        selectedHome = (ParseObject) o;
+                        Toast.makeText(getApplicationContext(),selectedHome.get("HomeName").toString(), Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+                else{
+                    Toast.makeText(getApplicationContext(),"Error loading Home" + throwable.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                    Log.d("Error loading home", throwable.getLocalizedMessage());
+                }
+            }
+        });
     }
+    public void showMembers(View view){
+        Intent showMembers = new Intent(getApplicationContext(), ShowMembers.class);
+        showMembers.putExtra("HomeObjectID", selectedHome.getObjectId());
+        showMembers.putExtra("HomeName",selectedHome.get("HomeName").toString());
+        startActivity(showMembers);
+    }
+
+
+
     public void setLogoutListener(){
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {

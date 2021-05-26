@@ -26,7 +26,8 @@ import java.util.List;
 
 public class MyHomes extends AppCompatActivity {
 ListView myHomesListView;
-ArrayList<String> homeObjects = new ArrayList<String>();
+ArrayList<String> homeObjectsHomeName = new ArrayList<String>();
+ArrayList<String> homeObjectsIDs = new ArrayList<String>();
 BottomNavigationView bottomNavigationView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +68,8 @@ BottomNavigationView bottomNavigationView;
                     else{
                         Log.i("objects list size", Integer.toString(objects.size()));
                         for(ParseObject object: objects){
-                            homeObjects.add(object.getString("HomeName"));
+                            homeObjectsHomeName.add(object.getString("HomeName"));
+                            homeObjectsIDs.add(object.getObjectId());
 
                         }
                         populateListView();
@@ -81,7 +83,7 @@ BottomNavigationView bottomNavigationView;
         });
     }
     public void populateListView(){
-        ArrayAdapter<String> memberObjectsAdapter = new ArrayAdapter<String>(this, R.layout.list_layout, R.id.list_content,homeObjects);
+        ArrayAdapter<String> memberObjectsAdapter = new ArrayAdapter<String>(this, R.layout.list_layout, R.id.list_content,homeObjectsHomeName);
         memberObjectsAdapter.notifyDataSetChanged();
         myHomesListView.setAdapter(memberObjectsAdapter);
         listViewItemClickListener();
@@ -90,13 +92,18 @@ BottomNavigationView bottomNavigationView;
         myHomesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                changeActivity(HomeScreen.class);
-                Toast.makeText(getApplicationContext(), homeObjects.get(position), Toast.LENGTH_SHORT).show();
+                goToHomeThatWasSelected(HomeScreen.class, position);
             }
         });
     }
     public void changeActivity(Class activity){
         Intent switchActivity = new Intent(getApplicationContext(), activity);
+        startActivity(switchActivity);
+    }
+    public void goToHomeThatWasSelected(Class activity, int position){
+        Intent switchActivity = new Intent(getApplicationContext(), activity);
+        switchActivity.putExtra("HomeName", homeObjectsHomeName.get(position));
+        switchActivity.putExtra("HomeObjectID", homeObjectsIDs.get(position));
         startActivity(switchActivity);
     }
 }
