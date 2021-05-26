@@ -45,6 +45,9 @@ public class HomeScreen extends AppCompatActivity {
                 if(item.getItemId() == R.id.logoutItem){
                    logoutAlertDialog();
                 }
+                else if(item.getItemId() == R.id.backItem){
+                    changeActivity(MyHomes.class);
+                }
                 return false;
             }
         });
