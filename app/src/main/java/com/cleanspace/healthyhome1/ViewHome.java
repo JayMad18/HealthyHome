@@ -200,6 +200,7 @@ public class ViewHome extends AppCompatActivity {
         membersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //TODO this is where the code will go that will display the members info when clivked on.
                 Toast.makeText(getApplicationContext(), memberNames.get(position), Toast.LENGTH_SHORT).show();
             }
         });

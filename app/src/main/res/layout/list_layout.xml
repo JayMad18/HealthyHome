@@ -23,7 +23,6 @@
             android:layout_margin="4dp"
             android:gravity="center"
             android:textSize="30dp"
-            android:longClickable="true"
             android:theme="@style/ShapeAppearance.MaterialComponents.Tooltip"
             android:textColor="@color/Pink" />
     </LinearLayout>
