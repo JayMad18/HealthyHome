@@ -46,6 +46,7 @@ public class CreateMemberActivity extends AppCompatActivity {
                ArrayList<String> homesList = new ArrayList<String>();
                user.put("HomeList", homesList);
                user.put("name", name.getText().toString());
+               user.put("EMAIL",email.getText().toString());
 
                user.setUsername(username.getText().toString());
                user.setPassword(password.getText().toString());

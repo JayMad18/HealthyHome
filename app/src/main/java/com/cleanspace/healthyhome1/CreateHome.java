@@ -89,7 +89,10 @@ public class CreateHome extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    Toast.makeText(getApplicationContext(),homeName.getText().toString() +" created succesfully!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),homeName.getText().toString() +" created succesfully!" +" home id:" + home.get("ID"), Toast.LENGTH_SHORT).show();
+                    Intent homeScreen = new Intent(getApplicationContext(),HomeScreen.class);
+                    homeScreen.putExtra("HomeObjectID", home.getObjectId());
+                    startActivity(homeScreen);
                 }
             }
         });

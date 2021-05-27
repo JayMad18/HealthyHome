@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -28,6 +30,7 @@ import java.util.List;
 public class ShowMembers extends AppCompatActivity {
     ArrayList<String> memberNames = new ArrayList<String>();
     ArrayList<String> memberObjectIds = new ArrayList<String>();
+    ArrayList<ParseUser> parseUsers = new ArrayList<ParseUser>();
     ListView membersListView;
     TextView titleView;
     String selectedHomeObjectId;
@@ -44,10 +47,28 @@ public class ShowMembers extends AppCompatActivity {
         membersListView = findViewById(R.id.membersListView);
         titleView = findViewById(R.id.title);
         titleView.setText(homeObjectId.getStringExtra("HomeName") + " members");
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
         populateListView();
         setLogoutListener();
+        onItemClickListener();
 
 
+    }
+    public void onItemClickListener(){
+      membersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+          @Override
+          public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+              Intent sendUserInfo = new Intent(getApplicationContext(), UserInfo.class);
+              //TODO: start new activity showing clicked user info.
+              ParseUser selectedUser = parseUsers.get(position);
+              sendUserInfo.putExtra("objectId", selectedUser.getObjectId());
+              sendUserInfo.putExtra("name", selectedUser.get("name").toString());
+              sendUserInfo.putExtra("username",selectedUser.getUsername());
+              //selected user needs a session token to use .getEmail(), which means only logged in user can use .getEmail()
+              sendUserInfo.putExtra("email",selectedUser.get("EMAIL").toString());
+              startActivity(sendUserInfo);
+          }
+      });
     }
 
     public void populateListView(){
@@ -62,6 +83,7 @@ public class ShowMembers extends AppCompatActivity {
                     for(ParseUser user: objects){
                         memberNames.add(user.get("name").toString());
                         memberObjectIds.add(user.getObjectId());
+                        parseUsers.add(user);
                     }
                     memberNamesAdapter.notifyDataSetChanged();
                     membersListView.setAdapter(memberNamesAdapter);
@@ -73,7 +95,7 @@ public class ShowMembers extends AppCompatActivity {
         });
     }
     public void setLogoutListener(){
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
+
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {

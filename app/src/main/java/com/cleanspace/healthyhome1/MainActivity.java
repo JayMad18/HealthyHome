@@ -22,34 +22,10 @@ public class MainActivity extends AppCompatActivity {
             changeActivity(Homes.class);
         }else {
             setContentView(R.layout.activity_main);
-            parseTest();
         }
 
     }
 
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        checkIfAlreadyLoggedIn();
-//    }
-
-    public void checkIfAlreadyLoggedIn(){
-        if(ParseUser.getCurrentSessionToken() != null){
-            changeActivity(HomeScreen.class);
-        }
-    }
-    public void parseTest(){
-        ParseObject firstObject = new  ParseObject("TestClass");
-        firstObject.put("message","Hey ! First message from android. Parse is now connected");
-        firstObject.saveInBackground(e -> {
-            if (e != null){
-                Log.e("MainActivity", e.getLocalizedMessage());
-                Toast.makeText(getApplicationContext(),"Parse connection failed: "+ e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-            }else{
-                Log.d("MainActivity","Object saved.");
-            }
-        });
-    }
     public void createMember(View view){
         changeActivity(CreateMemberActivity.class);
     }
