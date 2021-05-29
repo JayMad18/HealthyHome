@@ -20,9 +20,9 @@ public class UserInfo extends AppCompatActivity {
         userNameTextView = findViewById(R.id.userNameTextView);
         emailTextView = findViewById(R.id.emailTextView);
 
-        nameTextView.setText(userInfo.getStringExtra("name"));
-        userNameTextView.setText(userInfo.getStringExtra("username"));
-        emailTextView.setText(userInfo.getStringExtra("email"));
+        nameTextView.setText("Name: "+userInfo.getStringExtra("name"));
+        userNameTextView.setText("Username: "+userInfo.getStringExtra("username"));
+        emailTextView.setText("Email: "+userInfo.getStringExtra("email"));
         Log.i("Caught email", emailTextView.getText().toString());
     }
 }
