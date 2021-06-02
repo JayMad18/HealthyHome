@@ -78,8 +78,11 @@ public class HomeScreen extends AppCompatActivity {
         showMembers.putExtra("HomeName",selectedHome.get("HomeName").toString());
         startActivity(showMembers);
     }
-
-
+    public void addTask(View view){
+        Intent addTask = new Intent(getApplicationContext(), CreateTask.class);
+        addTask.putExtra("Home", selectedHome.getObjectId());
+        startActivity(addTask);
+    }
 
     public void setLogoutListener(){
         bottomNavigationView = findViewById(R.id.bottom_navigation);

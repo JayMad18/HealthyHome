@@ -103,7 +103,10 @@ public class ShowMembers extends AppCompatActivity {
                     logoutAlertDialog();
                 }
                 else if(item.getItemId() == R.id.backItem){
-                    changeActivity(Homes.class);
+                    Intent goBackToHomeScreen = new Intent(getApplicationContext(),HomeScreen.class);
+                    goBackToHomeScreen.putExtra("HomeObjectID", selectedHomeObjectId);
+                    startActivity(goBackToHomeScreen);
+
                 }
                 return false;
             }
