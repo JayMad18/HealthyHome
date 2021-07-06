@@ -143,7 +143,6 @@ public class HomeScreen extends AppCompatActivity {
 }
 
 class DownloadRandomQuote extends AsyncTask<String, Void, JSONObject>{
-
     @Override
     protected JSONObject doInBackground(String... urls) {
         try{
@@ -170,7 +169,6 @@ class DownloadRandomQuote extends AsyncTask<String, Void, JSONObject>{
             //e.printStackTrace();
             Log.i("Failed at do in background", e.toString());
         }
-
         return null;
     }
 }
