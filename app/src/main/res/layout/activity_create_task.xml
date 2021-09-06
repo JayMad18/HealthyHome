@@ -85,4 +85,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <ListView
+        android:id="@+id/membersListView"
+        android:layout_width="402dp"
+        android:layout_height="332dp"
+        app:layout_constraintBottom_toTopOf="@+id/createTaskButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/userNameEditText" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
