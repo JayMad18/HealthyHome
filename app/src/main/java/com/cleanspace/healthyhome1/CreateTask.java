@@ -23,7 +23,7 @@ import java.util.List;
 public class CreateTask extends AppCompatActivity {
     EditText taskNameEditText, userNameEditText;
     ArrayList<ParseUser> membersOfHome = new ArrayList<ParseUser>();
-    //
+
     ListView membersListView;
     String selectedHomeObjectId;
     ArrayList<ParseUser> parseUsers = new ArrayList<ParseUser>();
