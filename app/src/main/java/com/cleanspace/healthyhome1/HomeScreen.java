@@ -72,15 +72,24 @@ public class HomeScreen extends AppCompatActivity {
             }
         });
     }
+    /*
+    * Creates and sends and Intent to start ShowMembers activity
+    * Intent includes two Extra's, HomeObjectID and HomeName
+    * */
     public void showMembers(View view){
         Intent showMembers = new Intent(getApplicationContext(), ShowMembers.class);
         showMembers.putExtra("HomeObjectID", selectedHome.getObjectId());
         showMembers.putExtra("HomeName",selectedHome.get("HomeName").toString());
         startActivity(showMembers);
     }
+
+    /*
+    * Creates and sends an Intent to start CreateTask activity
+    * Intent includes one Extra, HomeObjectID
+    * */
     public void addTask(View view){
         Intent addTask = new Intent(getApplicationContext(), CreateTask.class);
-        addTask.putExtra("Home", selectedHome.getObjectId());
+        addTask.putExtra("HomeObjectID", selectedHome.getObjectId());
         startActivity(addTask);
     }
 
