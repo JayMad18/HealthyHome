@@ -33,6 +33,8 @@ public class CreateHome extends AppCompatActivity {
     BottomNavigationView bottomNavigationView;
     public Boolean isUnique;
     public ArrayList<String> currentExistingHomeIDs = new ArrayList<String>();
+
+    //also sets logout listener in bottomNav
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +42,12 @@ public class CreateHome extends AppCompatActivity {
         setLogoutListener();
     }
 
+    /*
+    Takes a unique id
+    * Creates and saves the home to the database
+    * creates and saves an arraylist of members of the home to the Home.
+    *
+    * */
     public void saveHomeToDataBase(String id) throws JSONException {
         EditText homeName = findViewById(R.id.homeNameEditText);
         ParseObject home = new ParseObject("Homes");
@@ -66,14 +74,13 @@ public class CreateHome extends AppCompatActivity {
                 }
             }
         });
-
-        //Trying to save an arraylist of homes for the user here but keeps returning null
-        //confusing because when I run it on the debugger it works fine and saves the home ObjectId to the arraylist column
-
-        //SOLUTION!!It was because the User data was saving in the background before the Home data got saved, so
-        //all I had to do was put User save process inside done() method of saveinbackground for home.
     }
 
+    //Trying to save an arraylist of homes for the user here but keeps returning null
+    //confusing because when I run it on the debugger it works fine and saves the home ObjectId to the arraylist column
+
+    //SOLUTION!!It was because the User data was saving in the background before the Home data got saved, so
+    //all I had to do was put User save process inside done() method of saveinbackground for home.
     public void saveHomeToArrayList(ParseUser user, ParseObject home){
         ArrayList<String> homesList = (ArrayList) user.getList("HomeList");
         homesList.add(home.getObjectId());
@@ -97,7 +104,15 @@ public class CreateHome extends AppCompatActivity {
             }
         });
     }
+    /*
+    calls generateID() which generates random id
+    * Checks if Id is not unique i.e., already exist's.
+    * if id not unique it recursively calls itself again until unique id generated
+    * when unique id generated, passes id to saveHomeToDataBase(int)
 
+    - this method will have to be updated because once 10,000 id's have been created
+    the method will recursivly call itself forever.
+    * */
     public void generateUniqueId(View view){
         String id = generateID();
 
@@ -128,7 +143,7 @@ public class CreateHome extends AppCompatActivity {
        });
 
     }
-
+    //Simple random 4 character ID generator, 10^4 = 10,000 possible combinations. 0000 - 9999
     public String generateID(){
         String IDstring = "";
         Random random = new Random();
@@ -138,7 +153,9 @@ public class CreateHome extends AppCompatActivity {
         }
         return IDstring;
     }
-
+    /*
+    * initializes bottomNav and calls itemSelectedListener,
+    * */
     public void setLogoutListener(){
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -162,11 +179,11 @@ public class CreateHome extends AppCompatActivity {
             }
         });
     }
-
+    //helper method to quickly go back to Homes activity
     public void goBack(View view){
         changeActivity(Homes.class);
     }
-
+    //helper method to quickly change activities
     public void changeActivity(Class activity){
         Intent switchActivity = new Intent(getApplicationContext(), activity);
         startActivity(switchActivity);

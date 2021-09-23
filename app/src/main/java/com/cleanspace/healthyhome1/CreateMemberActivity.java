@@ -31,6 +31,10 @@ public class CreateMemberActivity extends AppCompatActivity {
 
     }
 
+    /*
+    * Calls two methods helper methods to make sure all textfields are filled
+    * and both passwords match before Saving the user to the server.
+    * */
     public void submit(View view){
         /* TODO submit member profile data to parse server and Log Into Home Dashboard */
        if(allTextFieldsFilled()){
@@ -52,11 +56,17 @@ public class CreateMemberActivity extends AppCompatActivity {
                user.setPassword(password.getText().toString());
                user.setEmail(email.getText().toString());
 
+               //ParseUser class method to sign up
                user.signUpInBackground(new SignUpCallback() {
                    public void done(ParseException e) {
                        if (e == null) {
                            Log.i("Session Token", user.getSessionToken());
                            Toast.makeText(getApplicationContext(),"Submitted Succefully", Toast.LENGTH_LONG).show();
+
+                           /*
+                           *  -we dont have to send any extra data containing info to identify the current user since
+                           *   now that the user is created and logged in, we can use the ParseUser.getCurrentUser() method to get the current user.
+                           * */
                            changeActivity(Homes.class);
                        } else {
                            // Sign up didn't succeed. Look at the ParseException
@@ -75,9 +85,13 @@ public class CreateMemberActivity extends AppCompatActivity {
            Toast.makeText(getApplicationContext(),"Please fill out all text fields", Toast.LENGTH_LONG).show();
        }
     }
+    //Switches to the MainActivty acticity
     public void goBack(View view){
         changeActivity(MainActivity.class);
     }
+    /*
+    * Calls the ParseUser class method "LogOutInBackground(LogOutCallback(){...})" to log the user out
+    * */
     public void logout(View view){
         ParseUser.logOutInBackground(new LogOutCallback() {
             @Override
@@ -98,6 +112,7 @@ public class CreateMemberActivity extends AppCompatActivity {
 
     }
 
+    //Checks if all textfields have been filled out before allowing submit, returns boolean
     public Boolean allTextFieldsFilled(){
         EditText name = findViewById(R.id.nameEditText);
         EditText username = findViewById(R.id.userNameEditText);
@@ -110,6 +125,7 @@ public class CreateMemberActivity extends AppCompatActivity {
         }
         return true;
     }
+    //Checks if both passwords match before allowing submit, returns boolean
     public Boolean passwordMatch(){
         EditText password = findViewById(R.id.passwordEditText);
         EditText conPassword = findViewById(R.id.confirmPasswordEditText);
@@ -119,19 +135,18 @@ public class CreateMemberActivity extends AppCompatActivity {
         }
         return false;
     }
+    //helper method to return a boolean if a textfield is empty
     private boolean isEmpty(EditText etText) {
         if (etText.getText().toString().trim().length() > 0) {
             return false;
         }
         return true;
     }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-    }
-
+    /*
+     * This method onResume() is used in case the user somehow makes their way to
+     * the CreateMemberActivity activity while already logged in i.e., there is already a session token active.
+     * The method will automatically log out the current user to prevent session token glitches
+     * */
     @Override
     protected void onResume() {
         super.onResume();
@@ -151,6 +166,7 @@ public class CreateMemberActivity extends AppCompatActivity {
             });
         }
     }
+    //helper method to quickly switch activites without sending any Extra's
     public void changeActivity(Class activity){
         Intent switchActivity = new Intent(getApplicationContext(), activity);
         startActivity(switchActivity);

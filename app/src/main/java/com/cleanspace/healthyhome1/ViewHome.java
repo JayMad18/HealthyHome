@@ -37,6 +37,12 @@ public class ViewHome extends AppCompatActivity {
     ArrayList<String> memberNames = new ArrayList<String>();
     TextView homeNameView, homeIdView, numberOfMembersView, numberOfTasksView;
     BottomNavigationView bottomNavigationView;
+
+    /*
+    * onCreate() method recieves intent and data sent with intent after creating activity
+    *
+    * also initializes bottemNav view
+    * */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +58,12 @@ public class ViewHome extends AppCompatActivity {
 
     }
 
+
+    /*
+    * This method uses the homeId sent with the Intent in a query to find the particular Home's details
+    * once home is found it calls the populateMembersAndTaskViews(String) method
+    * then sets LogoutListner in the bottomNav
+    * */
     public void getHome(String homeId){
          homeNameView = findViewById(R.id.homeNameTextView);
          homeIdView = findViewById(R.id.homeIdTextView);
@@ -77,14 +89,18 @@ public class ViewHome extends AppCompatActivity {
 
 
                     populateMemberAndTaskViews(foundHomeObject.get("ID").toString());
-
+                    /*
+                    * Bottom navigation item selection listener method from the bottomNav View class
+                    * */
                     bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
                         @Override
                         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                            //only item that has a name id, any other item clicked calls the else statement
                             if(item.getItemId() == R.id.backItem){
                                 changeActivity(Homes.class);
                             }
                             else{
+
                                 //TODO:Send Join request to members of the retrieved home to be accepted or rejected. Via Push Notification.
                                 addMemberToHome();
                             }
@@ -101,6 +117,12 @@ public class ViewHome extends AppCompatActivity {
         });
     }
 
+    /*
+    * Called by the bottomNav listener method whenever the backItem is NOT clicked.
+    * adds the current session user to the home
+    * in the future it will first send a join request push notification to current members of the home
+    * to be accepted or rejected.
+    * */
     public void addMemberToHome(){
         ParseUser user = ParseUser.getCurrentUser();
 
@@ -125,13 +147,17 @@ public class ViewHome extends AppCompatActivity {
                 }
             });
         }
-        else{
+        else{//self explanitory
             Toast.makeText(getApplicationContext(),"User already belongs to this home", Toast.LENGTH_SHORT).show();
             Log.i("User Object ID rejected", user.getObjectId());
         }
 
     }
 
+    /*
+    * Called when the user joins the home
+    * this method adds this home to the user's list of homes that he/she is currently apart of.
+    * */
     public void saveHomeToArrayList(ParseUser user, ParseObject home){
         ArrayList<String> homesList = (ArrayList) user.getList("HomeList");
         homesList.add(home.getObjectId());
@@ -147,7 +173,14 @@ public class ViewHome extends AppCompatActivity {
             }
         });
     }
-
+    /*
+    * This method name is partially inaccurate as it only populates the numberOfTasksView with the number of current tasks the home has.
+    *
+    * calls populateListView which fills a listview with names of members of the home.
+    *
+    * gets number of tasks by searching for tasks that contain the current Home objectId in Home column
+    * then gets the number of tasks from the size of the returned objects list from findInBackGround(){..} method.
+    * */
     public void populateMemberAndTaskViews(String homeId){
         ArrayList<String> membersList = (ArrayList) foundHomeObject.getList("MembersList");
         numberOfMembersView = findViewById(R.id.numberOfMembersTextView);
@@ -156,7 +189,7 @@ public class ViewHome extends AppCompatActivity {
 
         //getting number of tasks from task pointer
         ParseQuery<ParseObject> taskQuery = ParseQuery.getQuery("Homes");
-        taskQuery.whereEqualTo("Home", homeId);
+        taskQuery.whereEqualTo("Home", foundHomeObject.getObjectId());
         taskQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
@@ -172,6 +205,11 @@ public class ViewHome extends AppCompatActivity {
         });
     }
 
+    /*
+    *Populates the listview in the middle of the screen with the names of the members
+    * who currently reside in that home.
+    * Also updates the number of members textview
+    * */
     public void populateListView(){
         ListView membersListView = findViewById(R.id.membersListView);
 

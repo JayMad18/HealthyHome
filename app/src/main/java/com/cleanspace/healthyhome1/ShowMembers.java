@@ -40,7 +40,9 @@ public class ShowMembers extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_members);
-
+        /*
+        * Takes data sent from intent to search for user's that belong to the home
+        * */
         Intent homeObjectId = getIntent();
         selectedHomeObjectId = homeObjectId.getStringExtra("HomeObjectID");
 
@@ -54,6 +56,10 @@ public class ShowMembers extends AppCompatActivity {
 
 
     }
+    /*
+    * A item click listener that sends an Intent to switch to UserInfo activity
+    * also send extra data about the user with the intent
+    * */
     public void onItemClickListener(){
       membersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
           @Override
@@ -71,6 +77,7 @@ public class ShowMembers extends AppCompatActivity {
       });
     }
 
+    //populates a listview with members of a home
     public void populateListView(){
         ArrayAdapter<String> memberNamesAdapter = new ArrayAdapter<String>(this, R.layout.list_layout, R.id.list_content,memberNames);
 
@@ -94,6 +101,7 @@ public class ShowMembers extends AppCompatActivity {
             }
         });
     }
+    //bottom nav item click listener
     public void setLogoutListener(){
 
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -112,6 +120,8 @@ public class ShowMembers extends AppCompatActivity {
             }
         });
     }
+    //logout alert dialog to ask if sure want to log out
+    //this needs to be implemented in all activites that allow one to log out
     public void logoutAlertDialog(){
         new AlertDialog.Builder(this).setTitle("Log out").setMessage("Are you sure you want to log out?")
                 .setIcon(android.R.drawable.ic_media_previous).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -121,6 +131,7 @@ public class ShowMembers extends AppCompatActivity {
             }
         }).setNegativeButton("No", null).show();
     }
+    //logout in its own method
     public void logout(){
         ParseUser.logOutInBackground(new LogOutCallback() {
             @Override
@@ -135,6 +146,7 @@ public class ShowMembers extends AppCompatActivity {
             }
         });
     }
+    //helper method to quickly change activites
     public void changeActivity(Class activity){
         Intent switchActivity = new Intent(getApplicationContext(), activity);
         startActivity(switchActivity);

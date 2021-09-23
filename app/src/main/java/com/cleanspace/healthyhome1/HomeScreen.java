@@ -48,6 +48,9 @@ public class HomeScreen extends AppCompatActivity {
         generateQuote();
         setLogoutListener();
 
+        /*
+        * uses data sent from intent to search for the clicked home and fill in appropriate data for the home
+        * */
         ParseQuery selectedHomeQuery = ParseQuery.getQuery("Homes");
         selectedHomeQuery.whereEqualTo("objectId", sentHome.getStringExtra("HomeObjectID"));
         selectedHomeQuery.getFirstInBackground(new GetCallback() {
@@ -92,7 +95,7 @@ public class HomeScreen extends AppCompatActivity {
         addTask.putExtra("HomeObjectID", selectedHome.getObjectId());
         startActivity(addTask);
     }
-
+    //bottom nav item click listener
     public void setLogoutListener(){
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -108,6 +111,10 @@ public class HomeScreen extends AppCompatActivity {
             }
         });
     }
+    /*
+    * A logout alert dialog that ask's if sure want to log out,
+    * this needs to be implemented in all activites that allow user to log out
+    * */
     public void logoutAlertDialog(){
         new AlertDialog.Builder(this).setTitle("Log out").setMessage("Are you sure you want to log out?")
                 .setIcon(android.R.drawable.ic_media_previous).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -117,6 +124,7 @@ public class HomeScreen extends AppCompatActivity {
             }
         }).setNegativeButton("No", null).show();
     }
+    //logout in its own method
     public void logout(){
         ParseUser.logOutInBackground(new LogOutCallback() {
             @Override
@@ -131,15 +139,19 @@ public class HomeScreen extends AppCompatActivity {
             }
         });
     }
+    //helper method to quickly switch activites
     public void changeActivity(Class activity){
         Intent switchActivity = new Intent(getApplicationContext(), activity);
         startActivity(switchActivity);
     }
+
+    //Called in onCreate to download random quote with another class on another thread while also creating the activity
     @SuppressLint("SetTextI18n")
     private void generateQuote(){
         quoteView = findViewById(R.id.quoteView);
         DownloadRandomQuote randomQuote = new DownloadRandomQuote();
         try{
+            //link to random quote api
             JSONObject jsonData = randomQuote.execute("https://api.quotable.io/random?maxLength=50").get();
             Log.i("JSON data tostring", jsonData.toString());
             String content = jsonData.getString("content");
@@ -150,7 +162,11 @@ public class HomeScreen extends AppCompatActivity {
         }
     }
 }
-
+/*
+* This class was made for fun to download a random quote from
+* a random quote generator JSON api, I decided to leave it in the app.
+* AsyncTask is marked out because it is depreciated but it still works
+* */
 class DownloadRandomQuote extends AsyncTask<String, Void, JSONObject>{
     @Override
     protected JSONObject doInBackground(String... urls) {

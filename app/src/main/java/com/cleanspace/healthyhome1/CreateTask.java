@@ -65,9 +65,12 @@ public class CreateTask extends AppCompatActivity {
 
         //populateListView();
     }
+
+    /*
+    * Creates and saves task to the server.
+    *
+    * */
     public void createTask(View view){
-
-
         ParseObject task = new ParseObject("Tasks");
         task.put("Name", taskNameEditText.getText().toString());
         task.put("Home", selectedHomeObjectId);

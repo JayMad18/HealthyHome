@@ -9,6 +9,9 @@ import android.widget.TextView;
 
 public class UserInfo extends AppCompatActivity {
     TextView nameTextView, userNameTextView, emailTextView;
+    /*
+    * Only onCreate method that displays info on the clicked user as soon as activity created.
+    * */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
