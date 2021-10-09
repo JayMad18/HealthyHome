@@ -69,7 +69,7 @@ BottomNavigationView bottomNavigationView;
                     //matter of fact it would not have had any objectId to search.
                     if(ParseUser.getCurrentUser() == null){
                         Toast.makeText(getApplicationContext(),"getCurrentUser = null", Toast.LENGTH_SHORT).show();
-                        Log.i("user = null", e.getLocalizedMessage());
+                        Log.i("user = null", "User null");
                     }//I think these were just over-cautionary checks
                     else if(objects == null){
                         Toast.makeText(getApplicationContext(),"returned objects list = null", Toast.LENGTH_SHORT).show();

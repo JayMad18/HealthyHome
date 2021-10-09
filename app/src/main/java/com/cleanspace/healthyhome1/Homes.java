@@ -3,6 +3,8 @@ package com.cleanspace.healthyhome1;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,7 +28,7 @@ import com.parse.ParseUser;
 import java.util.List;
 
 public class Homes extends AppCompatActivity {
-    BottomNavigationView logout;
+    BottomNavigationView bottomNavigationView;
     ParseObject foundHomeObject;
 
     //Includes setLogoutListener to listen for logout as soon as activity is created
@@ -34,7 +36,7 @@ public class Homes extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_homes);
-        setLogoutListener();
+        setBottomNavListener();
 
     }
 
@@ -44,6 +46,10 @@ public class Homes extends AppCompatActivity {
     * */
     public void createNewHome(View view){
         changeActivity(CreateHome.class);
+
+        /**
+         * Code below will allow users to only have one home, I believe I may need to use this again
+         */
 //        ParseQuery<ParseObject> homeQuery = ParseQuery.getQuery("Homes");
 //        homeQuery.whereEqualTo("Members", ParseUser.getCurrentUser().getObjectId());
 //        homeQuery.getFirstInBackground(new GetCallback<ParseObject>() {
@@ -124,33 +130,50 @@ public class Homes extends AppCompatActivity {
         startActivity(viewHome);
     }
 
-    /*
-    * This method uses the bottomNavigationView to host the Logout method
-    * */
-    public void setLogoutListener(){
-        logout = findViewById(R.id.bottom_navigation);
-        logout.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+    //bottom nav item click listener
+    public void setBottomNavListener(){
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 if(item.getItemId() == R.id.logoutItem){
-                    ParseUser.logOutInBackground(new LogOutCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            if(e == null){
-                                Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
-                                changeActivity(MainActivity.class);
-                            }else{
-                                Log.i("ERROR!!!!!!", e.getLocalizedMessage());
-                                Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
+                    logoutAlertDialog();
+                }
+                else if(item.getItemId() == R.id.backItem){
+                    changeActivity(MyHomes.class);
                 }
                 return false;
             }
         });
     }
-
+    /*
+     * A logout alert dialog that ask's if sure want to log out,
+     * this needs to be implemented in all activites that allow user to log out
+     * */
+    public void logoutAlertDialog(){
+        new AlertDialog.Builder(this).setTitle("Log out").setMessage("Are you sure you want to log out?")
+                .setIcon(android.R.drawable.ic_media_previous).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                logout();
+            }
+        }).setNegativeButton("No", null).show();
+    }
+    //logout in its own method
+    public void logout(){
+        ParseUser.logOutInBackground(new LogOutCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e == null){
+                    Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
+                    changeActivity(MainActivity.class);
+                }else{
+                    Log.i("ERROR!!!!!!", e.getLocalizedMessage());
+                    Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
     //Helper method to change activites quickly
     public void changeActivity(Class activity){
         Intent switchActivity = new Intent(getApplicationContext(), activity);

@@ -34,6 +34,9 @@ public class CreateMemberActivity extends AppCompatActivity {
     /*
     * Calls two methods helper methods to make sure all textfields are filled
     * and both passwords match before Saving the user to the server.
+    *
+    * -note: any Array columns that exist on the server need to be defined here and saved
+    * so that the Array column for that user is not undifined.
     * */
     public void submit(View view){
         /* TODO submit member profile data to parse server and Log Into Home Dashboard */
@@ -48,6 +51,8 @@ public class CreateMemberActivity extends AppCompatActivity {
                ParseUser user = new ParseUser();
 
                ArrayList<String> homesList = new ArrayList<String>();
+               ArrayList<String> taskList = new ArrayList<String>();
+               user.put("taskList",taskList);
                user.put("HomeList", homesList);
                user.put("name", name.getText().toString());
                user.put("EMAIL",email.getText().toString());

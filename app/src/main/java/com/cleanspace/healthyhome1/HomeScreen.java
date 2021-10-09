@@ -29,6 +29,7 @@ import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -39,18 +40,52 @@ public class HomeScreen extends AppCompatActivity {
     BottomNavigationView bottomNavigationView;
     ParseObject selectedHome;
 
+    Intent sentHome;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
-        Intent sentHome = getIntent();
+        sentHome = getIntent();
         generateQuote();
-        setLogoutListener();
+        setBottomNavListener();
+        retrieveSelectedHome();
+    }
 
-        /*
-        * uses data sent from intent to search for the clicked home and fill in appropriate data for the home
-        * */
+    /**
+     * This method below will but put into the MyTasks activity
+     * TODO **TODO** still need to update the assigned member's list of task's.
+     *                           -solution: will update members list of tasks by
+     *                           querying task's containing user's objectId. This will
+     *                           take place everytime the member clicks on "MY TASKS"
+     *                           button.
+     */
+//
+//    public void loadUsersTasksForThisHome(){
+//        ParseQuery taskQuery = ParseQuery.getQuery("Tasks");
+//        taskQuery.whereEqualTo("Home", selectedHome.getObjectId());
+//        taskQuery.whereEqualTo("assignToObjectId", ParseUser.getCurrentUser().getObjectId());
+//        taskQuery.findInBackground(new FindCallback() {
+//            @Override
+//            public void done(List objects, ParseException e) {
+//                if(){
+//
+//                }
+//            }
+//
+//            @Override
+//            public void done(Object o, Throwable throwable) {
+//
+//            }
+//        });
+//    }
+
+    /*
+     * uses data sent from intent to search for the clicked home and fill in appropriate data for the home
+     * FILLS IN THE selectedHome global variable
+     * */
+    public void retrieveSelectedHome(){
         ParseQuery selectedHomeQuery = ParseQuery.getQuery("Homes");
         selectedHomeQuery.whereEqualTo("objectId", sentHome.getStringExtra("HomeObjectID"));
         selectedHomeQuery.getFirstInBackground(new GetCallback() {
@@ -75,6 +110,7 @@ public class HomeScreen extends AppCompatActivity {
             }
         });
     }
+
     /*
     * Creates and sends and Intent to start ShowMembers activity
     * Intent includes two Extra's, HomeObjectID and HomeName
@@ -96,7 +132,7 @@ public class HomeScreen extends AppCompatActivity {
         startActivity(addTask);
     }
     //bottom nav item click listener
-    public void setLogoutListener(){
+    public void setBottomNavListener(){
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -105,7 +141,7 @@ public class HomeScreen extends AppCompatActivity {
                    logoutAlertDialog();
                 }
                 else if(item.getItemId() == R.id.backItem){
-                    changeActivity(MyHomes.class);
+                    changeActivity(HomeScreen.class);
                 }
                 return false;
             }

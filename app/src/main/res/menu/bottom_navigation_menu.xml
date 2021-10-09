@@ -10,11 +10,11 @@
         android:enabled="true"
         android:icon="@drawable/ic_home_black_24dp"
         android:title="@string/bottem_nav_home"/>
-    <item
-        android:id="@+id/page_2"
-        android:enabled="true"
-        android:icon="@drawable/baseline_settings_suggest_black_18dp"
-        android:title="@string/bottem_nav_settings"/>
+<!--    <item-->
+<!--        android:id="@+id/page_2"-->
+<!--        android:enabled="true"-->
+<!--        android:icon="@drawable/baseline_settings_suggest_black_18dp"-->
+<!--        android:title="@string/bottem_nav_settings"/>-->
     <item
         android:id="@+id/logoutItem"
         android:enabled="true"
