@@ -127,7 +127,7 @@ public class CreateTask extends AppCompatActivity {
         task.put("Home", selectedHomeObjectId);
         task.put("details",detailsEditText.getText().toString());
 
-        //TODO: check if isAssigned boolean is true when saving task.
+        //TODO: check if isAssigned boolean is true when saving task. x
         if(isAssigned){
             task.put("isAssigned", true);
             task.put("assignToObjectId", assignedMemberObjectId);
