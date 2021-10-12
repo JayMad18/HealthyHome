@@ -64,6 +64,8 @@ public class CreateTask extends AppCompatActivity {
      * TODO fix issue when user wants to immediatly create another task after another
      *         issue: previously created task gets overwritten if user never reloads the activity.
      *
+     *         Solution: switching back to HomeScreen after task is created.
+     *
      *
      */
 
@@ -127,7 +129,6 @@ public class CreateTask extends AppCompatActivity {
         task.put("Home", selectedHomeObjectId);
         task.put("details",detailsEditText.getText().toString());
 
-        //TODO: check if isAssigned boolean is true when saving task. x
         if(isAssigned){
             task.put("isAssigned", true);
             task.put("assignToObjectId", assignedMemberObjectId);
@@ -140,9 +141,11 @@ public class CreateTask extends AppCompatActivity {
                     if(isAssigned){
                         Toast.makeText(CreateTask.this, "Task created and assigned to " + memberObjects.get(position).get("name"), Toast.LENGTH_SHORT).show();
                         taskHasObjectId = true;
+                        changeActivity(HomeScreen.class);
                     }
                     else{
                         Toast.makeText(CreateTask.this, "Task created succesfully", Toast.LENGTH_SHORT).show();
+                        changeActivity(HomeScreen.class);
                     }
                 }
                 else{
@@ -196,8 +199,8 @@ public class CreateTask extends AppCompatActivity {
                 .setPositiveButton("Assign", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
                                 isAssigned = true;
+                                Toast.makeText(getApplicationContext(),memberObjects.get(position).get("name") + " has been assigned!",Toast.LENGTH_SHORT).show();
                     }
                 }).setNegativeButton("Don't assign", null).show();
     }
@@ -249,6 +252,7 @@ public class CreateTask extends AppCompatActivity {
     //helper method to quickly switch activites
     public void changeActivity(Class activity){
         Intent switchActivity = new Intent(getApplicationContext(), activity);
+        switchActivity.putExtra("HomeObjectID", selectedHomeObjectId);
         startActivity(switchActivity);
     }
 

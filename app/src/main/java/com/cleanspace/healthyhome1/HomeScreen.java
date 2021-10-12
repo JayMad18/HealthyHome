@@ -40,14 +40,14 @@ public class HomeScreen extends AppCompatActivity {
     BottomNavigationView bottomNavigationView;
     ParseObject selectedHome;
 
-    Intent sentHome;
+    Intent retrievedHome;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
-        sentHome = getIntent();
+        retrievedHome = getIntent();
         generateQuote();
         setBottomNavListener();
         retrieveSelectedHome();
@@ -87,7 +87,7 @@ public class HomeScreen extends AppCompatActivity {
      * */
     public void retrieveSelectedHome(){
         ParseQuery selectedHomeQuery = ParseQuery.getQuery("Homes");
-        selectedHomeQuery.whereEqualTo("objectId", sentHome.getStringExtra("HomeObjectID"));
+        selectedHomeQuery.whereEqualTo("objectId", retrievedHome.getStringExtra("HomeObjectID"));
         selectedHomeQuery.getFirstInBackground(new GetCallback() {
             @Override
             public void done(ParseObject object, ParseException e) { }
@@ -104,7 +104,7 @@ public class HomeScreen extends AppCompatActivity {
 
                 }
                 else{
-                    Toast.makeText(getApplicationContext(),"Error loading Home" + throwable.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),"Error loading Home " + throwable.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                     Log.d("Error loading home", throwable.getLocalizedMessage());
                 }
             }
@@ -141,7 +141,7 @@ public class HomeScreen extends AppCompatActivity {
                    logoutAlertDialog();
                 }
                 else if(item.getItemId() == R.id.backItem){
-                    changeActivity(HomeScreen.class);
+                    changeActivity(MyHomes.class);
                 }
                 return false;
             }
