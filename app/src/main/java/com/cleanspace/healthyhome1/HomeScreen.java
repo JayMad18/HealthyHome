@@ -82,8 +82,8 @@ public class HomeScreen extends AppCompatActivity {
 //    }
 
     /*
-     * uses data sent from intent to search for the clicked home and fill in appropriate data for the home
-     * FILLS IN THE selectedHome global variable
+     * uses data sent from intent to search for the clicked home ParseObject to easily get info about the home if necessary
+     * assigns the selectedHome ParseObject global variable
      * */
     public void retrieveSelectedHome(){
         ParseQuery selectedHomeQuery = ParseQuery.getQuery("Homes");
@@ -131,6 +131,9 @@ public class HomeScreen extends AppCompatActivity {
         addTask.putExtra("HomeObjectID", selectedHome.getObjectId());
         startActivity(addTask);
     }
+
+
+
     //bottom nav item click listener
     public void setBottomNavListener(){
         bottomNavigationView = findViewById(R.id.bottom_navigation);

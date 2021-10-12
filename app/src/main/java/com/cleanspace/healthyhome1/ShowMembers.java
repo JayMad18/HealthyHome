@@ -70,6 +70,7 @@ public class ShowMembers extends AppCompatActivity {
               sendUserInfo.putExtra("objectId", selectedUser.getObjectId());
               sendUserInfo.putExtra("name", selectedUser.get("name").toString());
               sendUserInfo.putExtra("username",selectedUser.getUsername());
+              sendUserInfo.putExtra("HomeObjectID", selectedHomeObjectId);
               //selected user needs a session token to use .getEmail(), which means only logged in user can use .getEmail()
               sendUserInfo.putExtra("email",selectedUser.get("EMAIL").toString());
               startActivity(sendUserInfo);

@@ -215,7 +215,7 @@ public class CreateTask extends AppCompatActivity {
                     logoutAlertDialog();
                 }
                 else if(item.getItemId() == R.id.backItem){
-                    changeActivity(MyHomes.class);
+                    changeActivity(HomeScreen.class);
                 }
                 return false;
             }
