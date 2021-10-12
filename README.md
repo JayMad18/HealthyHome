@@ -1,3 +1,13 @@
+Quick notes to consider when coding:{
+
+	- When switching from one activity to the HomeScreen activity, remeber to 
+	always send the home object Id for the currently selected home. The intent 
+	key is like this .putStringExtra("HomeObjectID", home object id here );
+	
+	
+
+}
+
 
 # Healthy Home
 
