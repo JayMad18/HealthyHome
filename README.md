@@ -1,3 +1,16 @@
+Quick notes to consider when coding:{
+
+	- When switching from one activity to the HomeScreen activity, remeber to 
+	always send the home object Id for the currently selected home. The intent 
+	key is like this .putStringExtra("HomeObjectID", home object id here );
+		- For most activites that are accessed through the HomeScreen
+		activity, you will most likely need to pass around the home object id
+		asa stringExtra with the intent.
+	
+	
+
+}
+
 
 # Healthy Home
 
