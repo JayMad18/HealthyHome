@@ -16,6 +16,7 @@ public class UserInfo extends AppCompatActivity {
     BottomNavigationView bottomNavigationView;
 
     String selectedHomeObjectId;
+    String homeName;
 
 
 
@@ -33,12 +34,14 @@ public class UserInfo extends AppCompatActivity {
         userNameTextView = findViewById(R.id.userNameTextView);
         emailTextView = findViewById(R.id.emailTextView);
 
-        selectedHomeObjectId = userInfo.getStringExtra("HomeObjectID");        // <---| this variable is put before setBottomNavListener incase b/c I believe
+        homeName = userInfo.getStringExtra("HomeName");
+        selectedHomeObjectId = userInfo.getStringExtra("HomeObjectID");// <---| this variable is put before setBottomNavListener incase b/c I believe
         setBottomNavListener();                                                // <---| an error ma be thrown if the user tries to go back before
                                                                                //       selectedHomeObjectId has been initailized.
         nameTextView.setText("Name: "+userInfo.getStringExtra("name"));
         userNameTextView.setText("Username: "+userInfo.getStringExtra("username"));
         emailTextView.setText("Email: "+userInfo.getStringExtra("email"));
+
         Log.i("Caught email", emailTextView.getText().toString());
     }
     public void setBottomNavListener(){
@@ -57,6 +60,7 @@ public class UserInfo extends AppCompatActivity {
     public void changeActivity(Class activity){
         Intent switchActivity = new Intent(getApplicationContext(), activity);
         switchActivity.putExtra("HomeObjectID", selectedHomeObjectId);
+        switchActivity.putExtra("HomeName", homeName);
         startActivity(switchActivity);
     }
 }

@@ -195,7 +195,7 @@ public class HomeScreen extends AppCompatActivity {
             Log.i("JSON data tostring", jsonData.toString());
             String content = jsonData.getString("content");
             String author = jsonData.getString("author");
-            quoteView.setText(content + " "+author);
+            quoteView.setText(content + "\n"+ "-"+author);
         }catch (Exception e){
             e.printStackTrace();
         }

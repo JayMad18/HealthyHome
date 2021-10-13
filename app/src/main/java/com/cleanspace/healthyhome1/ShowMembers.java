@@ -36,6 +36,8 @@ public class ShowMembers extends AppCompatActivity {
     String selectedHomeObjectId;
     BottomNavigationView bottomNavigationView;
 
+    Intent homeObjectId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +45,8 @@ public class ShowMembers extends AppCompatActivity {
         /*
         * Takes data sent from intent to search for user's that belong to the home
         * */
-        Intent homeObjectId = getIntent();
+
+        homeObjectId = getIntent();
         selectedHomeObjectId = homeObjectId.getStringExtra("HomeObjectID");
 
         membersListView = findViewById(R.id.membersListView);
@@ -71,6 +74,7 @@ public class ShowMembers extends AppCompatActivity {
               sendUserInfo.putExtra("name", selectedUser.get("name").toString());
               sendUserInfo.putExtra("username",selectedUser.getUsername());
               sendUserInfo.putExtra("HomeObjectID", selectedHomeObjectId);
+              sendUserInfo.putExtra("HomeName", homeObjectId.getStringExtra("HomeName"));
               //selected user needs a session token to use .getEmail(), which means only logged in user can use .getEmail()
               sendUserInfo.putExtra("email",selectedUser.get("EMAIL").toString());
               startActivity(sendUserInfo);
