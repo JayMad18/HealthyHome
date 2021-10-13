@@ -10,7 +10,7 @@
     <Button
         android:id="@+id/topLeftButton"
         android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_height="150dp"
         android:background="@drawable/rounded_button"
         android:text="@string/top_left_button"
         android:onClick="myTasks"
@@ -21,7 +21,7 @@
     <Button
         android:id="@+id/topRightButton"
         android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_height="150dp"
         android:background="@drawable/rounded_button"
         android:text="@string/top_right_button"
         android:onClick="allTasks"
@@ -32,7 +32,7 @@
     <Button
         android:id="@+id/bottomLeftButton"
         android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_height="150dp"
         android:background="@drawable/rounded_button"
         android:text="@string/bottom_left_button"
         android:onClick="addTask"
@@ -43,7 +43,7 @@
     <Button
         android:id="@+id/bottomRightButton"
         android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_height="150dp"
         android:background="@drawable/rounded_button"
         android:onClick="showMembers"
         android:text="@string/bottom_right_button"

@@ -3,7 +3,9 @@ package com.cleanspace.healthyhome1;
 import android.app.Application;
 
 import com.parse.Parse;
-
+/*
+* This class connects the app to the parse server hosted by back4app
+* */
 public class App extends Application {
     @Override
     public void onCreate() {

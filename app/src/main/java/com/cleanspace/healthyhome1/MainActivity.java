@@ -15,6 +15,12 @@ import com.parse.ParseUser;
 
 public class MainActivity extends AppCompatActivity {
 
+    /*
+    onCreate method first checks if the app already has a session token
+    if session token exists then it automatically switches to the Homes activity
+    else then it calls the usual "setContentView(R.layout.activity_main);" method
+    * */
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,46 +28,21 @@ public class MainActivity extends AppCompatActivity {
             changeActivity(Homes.class);
         }else {
             setContentView(R.layout.activity_main);
-            parseTest();
         }
 
     }
-
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        checkIfAlreadyLoggedIn();
-//    }
-
-    public void checkIfAlreadyLoggedIn(){
-        if(ParseUser.getCurrentSessionToken() != null){
-            changeActivity(HomeScreen.class);
-        }
-    }
-    public void parseTest(){
-        ParseObject firstObject = new  ParseObject("TestClass");
-        firstObject.put("message","Hey ! First message from android. Parse is now connected");
-        firstObject.saveInBackground(e -> {
-            if (e != null){
-                Log.e("MainActivity", e.getLocalizedMessage());
-                Toast.makeText(getApplicationContext(),"Parse connection failed: "+ e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-            }else{
-                Log.d("MainActivity","Object saved.");
-            }
-        });
-    }
+    //switches to CreateMemberActivity activity
     public void createMember(View view){
         changeActivity(CreateMemberActivity.class);
     }
-
+    //switches to LoginActivity activity
     public void logIn(View view){
     changeActivity(LoginActivity.class);
     }
-
-    public void goNavTest(View view){
-        changeActivity(HomeScreen.class);
-    }
-
+    /*
+    helper method to quckly call an Intent to switch classes,
+    usually used when no Extra's need to be sent
+    * */
     public void changeActivity(Class activity){
         Intent switchActivity = new Intent(getApplicationContext(), activity);
         startActivity(switchActivity);

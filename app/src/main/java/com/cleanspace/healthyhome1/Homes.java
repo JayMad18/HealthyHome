@@ -3,6 +3,8 @@ package com.cleanspace.healthyhome1;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,40 +28,58 @@ import com.parse.ParseUser;
 import java.util.List;
 
 public class Homes extends AppCompatActivity {
-    BottomNavigationView logout;
+    BottomNavigationView bottomNavigationView;
     ParseObject foundHomeObject;
+
+    //Includes setLogoutListener to listen for logout as soon as activity is created
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_homes);
-        setLogoutListener();
+        setBottomNavListener();
 
     }
+
+    /*
+    * Switched to the CreateHome activity.
+    *
+    * */
     public void createNewHome(View view){
-        ParseQuery<ParseObject> homeQuery = ParseQuery.getQuery("Homes");
-        homeQuery.whereEqualTo("Members", ParseUser.getCurrentUser());
-        homeQuery.getFirstInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject object, ParseException e) {
-                //if no objects found matching query then method throws exception
-                if(e == null){
-                    //Homes containing member was found
-                    Toast.makeText(getApplicationContext(),"User is only allowed one home temporarily", Toast.LENGTH_SHORT).show();
-                }
-                else{
-                    if(e.getLocalizedMessage().equals("no results found for query")){
-                        changeActivity(CreateHome.class);
-                    }
-                    else{
-                        Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                        Log.i("Exeption thrown", e.getLocalizedMessage());
-                    }
-                }
-            }
-        });
+        changeActivity(CreateHome.class);
+
+        /**
+         * Code below will allow users to only have one home, I believe I may need to use this again
+         */
+//        ParseQuery<ParseObject> homeQuery = ParseQuery.getQuery("Homes");
+//        homeQuery.whereEqualTo("Members", ParseUser.getCurrentUser().getObjectId());
+//        homeQuery.getFirstInBackground(new GetCallback<ParseObject>() {
+//            @Override
+//            public void done(ParseObject object, ParseException e) {
+//                //if no objects found matching query then method throws exception
+//                if(e == null){
+//                    //Homes containing member was found
+//                    Log.i("TEST","TEST");
+//                    Toast.makeText(getApplicationContext(),"User is only allowed one home temporarily", Toast.LENGTH_SHORT).show();
+//                }
+//                else{
+//                    if(e.getLocalizedMessage().equals("no results found for query")){
+//                        changeActivity(CreateHome.class);
+//                    }
+//                    else{
+//                        Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+//                        Log.i("Exeption thrown", e.getLocalizedMessage());
+//                    }
+//                }
+//            }
+//        });
 
     }
 
+    /*
+    * Method allows user to enter an Id of a Home,
+    * then queries through homes to find Home with matching homeId not objectId
+    * home id is public objectId is private.
+    * */
     public void searchHome(View view){
         TextView resultsView = findViewById(R.id.searchResults);
         EditText searchExistingHomeEditText = findViewById(R.id.searchExistingHomeEditText);
@@ -95,6 +115,13 @@ public class Homes extends AppCompatActivity {
 
     }
 
+    /*
+    * After a user searches a home the user can click on it to view information about the home
+    * and in the future the user will be able to send a join request to the members of the home.
+    *
+    * Method Creates an Intent to Switch to ViewHome activity and also send's the HomeId along
+    * with the Intent.
+    * */
     public void viewHome(View view){
         //TODO: go to "ViewHome" activity to view home details and send join request.
         EditText searchExistingHomeEditText = findViewById(R.id.searchExistingHomeEditText);
@@ -103,35 +130,57 @@ public class Homes extends AppCompatActivity {
         startActivity(viewHome);
     }
 
-    public void setLogoutListener(){
-        logout = findViewById(R.id.bottom_navigation);
-        logout.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+    //bottom nav item click listener
+    public void setBottomNavListener(){
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 if(item.getItemId() == R.id.logoutItem){
-                    ParseUser.logOutInBackground(new LogOutCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            if(e == null){
-                                Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
-                                changeActivity(MainActivity.class);
-                            }else{
-                                Log.i("ERROR!!!!!!", e.getLocalizedMessage());
-                                Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
+                    logoutAlertDialog();
+                }
+                else if(item.getItemId() == R.id.backItem){
+                    changeActivity(MyHomes.class);
                 }
                 return false;
             }
         });
     }
-
+    /*
+     * A logout alert dialog that ask's if sure want to log out,
+     * this needs to be implemented in all activites that allow user to log out
+     * */
+    public void logoutAlertDialog(){
+        new AlertDialog.Builder(this).setTitle("Log out").setMessage("Are you sure you want to log out?")
+                .setIcon(android.R.drawable.ic_media_previous).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                logout();
+            }
+        }).setNegativeButton("No", null).show();
+    }
+    //logout in its own method
+    public void logout(){
+        ParseUser.logOutInBackground(new LogOutCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e == null){
+                    Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
+                    changeActivity(MainActivity.class);
+                }else{
+                    Log.i("ERROR!!!!!!", e.getLocalizedMessage());
+                    Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+    //Helper method to change activites quickly
     public void changeActivity(Class activity){
         Intent switchActivity = new Intent(getApplicationContext(), activity);
         startActivity(switchActivity);
     }
 
+    //helper method show a user's homes when multi home feature is implemented
     public void showUsersHomes(View view){
         changeActivity(MyHomes.class);
     }

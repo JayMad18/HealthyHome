@@ -22,6 +22,14 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
     }
 
+    /*
+    * Takes an email and a password then uses the information with the ParseUser object method
+    * "LogInInBackGround(email, password, LogInCallBack(){...})" to log the user in.
+    *
+    * If no exception is thrown during the callback then switches to Homes activity
+    *   -we dont have to send any extra data containing info to identify the current user since
+    *    now that the user is logged in, we can use the ParseUser.getCurrentUser() method to get the current user.
+    * */
     public void logIn(View view) {
         EditText email = findViewById(R.id.userNameEditText);
         EditText password = findViewById(R.id.passwordEditText);
@@ -42,16 +50,22 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-
+    //Switches back to MainActivity
     public void goBack(View view){
         changeActivity(MainActivity.class);
     }
 
+    //helper method
     public void changeActivity(Class activity){
         Intent switchActivity = new Intent(getApplicationContext(), activity);
         startActivity(switchActivity);
     }
 
+    /*
+    * This method onResume() is used in case the user somehow makes their way back to
+    * the login activity while already logged in i.e., there is already a session token active.
+    * The method will automatically log out the current user to prevent session token glitches
+    * */
     @Override
     protected void onResume() {
         super.onResume();

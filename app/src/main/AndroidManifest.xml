@@ -13,7 +13,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HealthyHome1">
-        <activity android:name=".MyHomes"></activity>
+        <activity android:name=".AllTasks"></activity>
+        <activity android:name=".MyTasks" />
+        <activity android:name=".CreateTask" />
+        <activity android:name=".UserInfo" />
+        <activity android:name=".ShowMembers" />
+        <activity android:name=".MyHomes" />
         <activity android:name=".ViewHome" />
         <activity android:name=".CreateHome" />
         <activity android:name=".Homes" />

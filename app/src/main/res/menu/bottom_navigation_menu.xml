@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/backItem"
+        android:enabled="true"
+        android:icon="@drawable/abc_vector_test"
+        android:title="@string/bottem_nav_back"/>
+    <item
         android:id="@+id/page_1"
         android:enabled="true"
         android:icon="@drawable/ic_home_black_24dp"
         android:title="@string/bottem_nav_home"/>
-    <item
-        android:id="@+id/page_2"
-        android:enabled="true"
-        android:icon="@drawable/baseline_settings_suggest_black_18dp"
-        android:title="@string/bottem_nav_settings"/>
+<!--    <item-->
+<!--        android:id="@+id/page_2"-->
+<!--        android:enabled="true"-->
+<!--        android:icon="@drawable/baseline_settings_suggest_black_18dp"-->
+<!--        android:title="@string/bottem_nav_settings"/>-->
     <item
         android:id="@+id/logoutItem"
         android:enabled="true"

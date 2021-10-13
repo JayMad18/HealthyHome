@@ -1,3 +1,16 @@
+Quick notes to consider when coding:{
+
+	- When switching from one activity to the HomeScreen activity, remeber to 
+	always send the home object Id for the currently selected home. The intent 
+	key is like this .putStringExtra("HomeObjectID", home object id here );
+		- For most activites that are accessed through the HomeScreen
+		activity, you will most likely need to pass around the home object id
+		asa stringExtra with the intent.
+	
+	
+
+}
+
 
 # Healthy Home
 
@@ -42,6 +55,15 @@
 	
 	The development branch will be merged with the Master branch after carefull consideration 
 	of the most useful contributions to be added.
+	
+	Here are examples of the data types on the Back4app server in json format:
+	User class:
+https://parsefiles.back4app.com/vwMLMU9rlgYaJLIOo8PEs79D3y52OD8irqJhVq31/80f3d19f3a6492bce998177d128ab868__User.zip
+	Homes class:
+https://parsefiles.back4app.com/vwMLMU9rlgYaJLIOo8PEs79D3y52OD8irqJhVq31/c7ac6fd23de39334c5c06a6c239fb707_Homes.zip
+	Tasks class:
+https://parsefiles.back4app.com/vwMLMU9rlgYaJLIOo8PEs79D3y52OD8irqJhVq31/2e37476d4fa36531cbea56b670687436_Tasks.zip
+
 
 	Please feel free to email or contact me about any questions so that you may better understand what is going on!
 	Personal number:229-230-0531
