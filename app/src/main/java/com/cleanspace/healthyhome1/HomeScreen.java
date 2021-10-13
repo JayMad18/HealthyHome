@@ -53,33 +53,42 @@ public class HomeScreen extends AppCompatActivity {
         retrieveSelectedHome();
     }
 
-    /**
-     * This method below will but put into the MyTasks activity
-     * TODO **TODO** still need to update the assigned member's list of task's.
-     *                           -solution: will update members list of tasks by
-     *                           querying task's containing user's objectId. This will
-     *                           take place everytime the member clicks on "MY TASKS"
-     *                           button.
-     */
-//
-//    public void loadUsersTasksForThisHome(){
-//        ParseQuery taskQuery = ParseQuery.getQuery("Tasks");
-//        taskQuery.whereEqualTo("Home", selectedHome.getObjectId());
-//        taskQuery.whereEqualTo("assignToObjectId", ParseUser.getCurrentUser().getObjectId());
-//        taskQuery.findInBackground(new FindCallback() {
-//            @Override
-//            public void done(List objects, ParseException e) {
-//                if(){
-//
-//                }
-//            }
-//
-//            @Override
-//            public void done(Object o, Throwable throwable) {
-//
-//            }
-//        });
-//    }
+
+
+
+    /*
+    * Creates and sends and Intent to start ShowMembers activity
+    * Intent includes two Extra's, HomeObjectID and HomeName
+    * */
+    public void showMembers(View view){
+        Intent showMembers = new Intent(getApplicationContext(), ShowMembers.class);
+        showMembers.putExtra("HomeObjectID", selectedHome.getObjectId());
+        showMembers.putExtra("HomeName",selectedHome.get("HomeName").toString());
+        startActivity(showMembers);
+    }
+
+    /*
+    * Creates and sends an Intent to start CreateTask activity
+    * Intent includes one Extra, HomeObjectID
+    * */
+    public void addTask(View view){
+        Intent addTask = new Intent(getApplicationContext(), CreateTask.class);
+        addTask.putExtra("HomeObjectID", selectedHome.getObjectId());
+        startActivity(addTask);
+    }
+
+    public void myTasks(View view){
+        Intent myTasks = new Intent(getApplicationContext(), MyTasks.class);
+        myTasks.putExtra("HomeObjectID", selectedHome.getObjectId());
+        startActivity(myTasks);
+    }
+
+    public void allTasks(View view){
+        Intent allTasks = new Intent(getApplicationContext(), AllTasks.class);
+        allTasks.putExtra("HomeObjectID", selectedHome.getObjectId());
+        startActivity(allTasks);
+    }
+
 
     /*
      * uses data sent from intent to search for the clicked home ParseObject to easily get info about the home if necessary
@@ -109,27 +118,6 @@ public class HomeScreen extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    /*
-    * Creates and sends and Intent to start ShowMembers activity
-    * Intent includes two Extra's, HomeObjectID and HomeName
-    * */
-    public void showMembers(View view){
-        Intent showMembers = new Intent(getApplicationContext(), ShowMembers.class);
-        showMembers.putExtra("HomeObjectID", selectedHome.getObjectId());
-        showMembers.putExtra("HomeName",selectedHome.get("HomeName").toString());
-        startActivity(showMembers);
-    }
-
-    /*
-    * Creates and sends an Intent to start CreateTask activity
-    * Intent includes one Extra, HomeObjectID
-    * */
-    public void addTask(View view){
-        Intent addTask = new Intent(getApplicationContext(), CreateTask.class);
-        addTask.putExtra("HomeObjectID", selectedHome.getObjectId());
-        startActivity(addTask);
     }
 
 

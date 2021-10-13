@@ -13,6 +13,7 @@
         android:layout_height="200dp"
         android:background="@drawable/rounded_button"
         android:text="@string/top_left_button"
+        android:onClick="myTasks"
         app:layout_constraintBottom_toTopOf="@+id/anchorButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -23,6 +24,7 @@
         android:layout_height="200dp"
         android:background="@drawable/rounded_button"
         android:text="@string/top_right_button"
+        android:onClick="allTasks"
         app:layout_constraintBottom_toTopOf="@+id/anchorButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
