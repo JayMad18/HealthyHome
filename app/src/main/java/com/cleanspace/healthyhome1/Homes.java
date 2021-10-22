@@ -108,7 +108,6 @@ public class Homes extends AppCompatActivity {
                 }
                 else{
                     Toast.makeText(getApplicationContext(),e.getLocalizedMessage(),Toast.LENGTH_LONG).show();
-                    Log.i("Error searching home ID", e.getLocalizedMessage());
                 }
             }
         });
@@ -168,7 +167,6 @@ public class Homes extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
                     changeActivity(MainActivity.class);
                 }else{
-                    Log.i("ERROR!!!!!!", e.getLocalizedMessage());
                     Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
             }

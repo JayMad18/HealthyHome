@@ -44,7 +44,6 @@ public class AllTasks extends AppCompatActivity {
         recievedIntent = getIntent();
 
         selectedHomeObjectId = recievedIntent.getStringExtra("HomeObjectID");
-        Log.i("loadUsersTasksForThisHome is being called", "!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         populateListView();
     }
 
@@ -54,7 +53,6 @@ public class AllTasks extends AppCompatActivity {
         taskListView = findViewById(R.id.taskListView);
 
         ParseQuery taskQuery = ParseQuery.getQuery("Tasks");
-        Log.i("Home object Id retrieved ", selectedHomeObjectId);
         taskQuery.whereEqualTo("Home", selectedHomeObjectId);
         taskQuery.findInBackground(new FindCallback() {
             @Override

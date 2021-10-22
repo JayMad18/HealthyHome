@@ -69,11 +69,9 @@ BottomNavigationView bottomNavigationView;
                     //matter of fact it would not have had any objectId to search.
                     if(ParseUser.getCurrentUser() == null){
                         Toast.makeText(getApplicationContext(),"getCurrentUser = null", Toast.LENGTH_SHORT).show();
-                        Log.i("user = null", "User null");
                     }//I think these were just over-cautionary checks
                     else if(objects == null){
                         Toast.makeText(getApplicationContext(),"returned objects list = null", Toast.LENGTH_SHORT).show();
-                        Log.i("objects = null", e.getLocalizedMessage());
                     }
                     else{
                         Log.i("objects list size", Integer.toString(objects.size()));
@@ -86,7 +84,6 @@ BottomNavigationView bottomNavigationView;
                     }
                 }
                 else{
-                    Log.i("Error loading homes into memberObjects arraylist", e.getLocalizedMessage());
                     Toast.makeText(getApplicationContext(),e.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
                 }
             }
