@@ -95,12 +95,10 @@ public class CreateTask extends AppCompatActivity {
             @Override
             public void done(ParseObject object, ParseException e) {
                 if(e == null){
-                    Log.i("query current home", "Home Found!");
                     homeObject = object;
                     task = new ParseObject("Tasks");
                 }
                 else {
-                    Log.i("query current home", e.getLocalizedMessage());
                     Toast.makeText(getApplicationContext(),e.getLocalizedMessage(),Toast.LENGTH_LONG).show();
                 }
             }
@@ -149,8 +147,6 @@ public class CreateTask extends AppCompatActivity {
                     }
                 }
                 else{
-
-                    Log.i("error message", e.getLocalizedMessage());
                     Toast.makeText(CreateTask.this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                 }
             }
@@ -175,7 +171,6 @@ public class CreateTask extends AppCompatActivity {
                     membersListView.setAdapter(memberNamesAdapter);
                 }else{
                     Toast.makeText(getApplicationContext(),"Error loading members "+e.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
-                    Log.d("error loading homes",e.getLocalizedMessage());
                 }
             }
         });
@@ -243,7 +238,6 @@ public class CreateTask extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
                     changeActivity(MainActivity.class);
                 }else{
-                    Log.i("ERROR!!!!!!", e.getLocalizedMessage());
                     Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
@@ -273,18 +267,15 @@ public class CreateTask extends AppCompatActivity {
      */
     boolean isKeyboardShowing = false;
     void onKeyboardVisibilityChanged(boolean opened) {
-        if(opened == false){
-            Log.i("keyboard " , "False");
-            // Toast.makeText(getApplicationContext(),"False",Toast.LENGTH_LONG).show();
-        }
-        else{
-            Log.i("keyboard " , "True");
-            // Toast.makeText(getApplicationContext(),"True",Toast.LENGTH_LONG).show();
-        }
+//        if(opened == false){
+//            // Toast.makeText(getApplicationContext(),"False",Toast.LENGTH_LONG).show();
+//        }
+//        else{
+//            // Toast.makeText(getApplicationContext(),"True",Toast.LENGTH_LONG).show();
+//        }
 
     }
     public void keyboardDetector(){
-        Log.d("JAY!!!!!!", "This is right before .getViewObserver is called");
         createTaskButton.getViewTreeObserver().addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
@@ -297,8 +288,6 @@ public class CreateTask extends AppCompatActivity {
                         // r.bottom is the position above soft keypad or device button.
                         // if keypad is shown, the r.bottom is smaller than that before.
                         int keypadHeight = screenHeight - r.bottom;
-
-                        Log.d("JAY!!!!!!", "keypadHeight = " + keypadHeight);
 
                         if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is perhaps enough to determine keypad height.
                             // keyboard is opened

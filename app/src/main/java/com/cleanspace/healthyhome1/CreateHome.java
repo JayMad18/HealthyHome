@@ -37,6 +37,8 @@ public class CreateHome extends AppCompatActivity {
     //also sets logout listener in bottomNav
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.i("","");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_home);
         setLogoutListener();
@@ -66,7 +68,6 @@ public class CreateHome extends AppCompatActivity {
             @Override
             public void done(ParseException e) {
                 if(e != null){
-                    Log.i("Error saving Members to array", e.getLocalizedMessage());
                     Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
                 else {
@@ -92,7 +93,6 @@ public class CreateHome extends AppCompatActivity {
             @Override
             public void done(ParseException e) {
                 if(e != null){
-                    Log.i("Error saving homesList to HomeList column", e.getLocalizedMessage());
                     Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
                 else{
@@ -130,14 +130,8 @@ public class CreateHome extends AppCompatActivity {
                        }
                    }
                    else{
-                       for(ParseObject object: objects){
-                           Log.i("Id that was caught from query", object.getString("ID"));
-                       }
                        generateUniqueId(view);
                    }
-               }
-               else{
-                   Log.i("Error @ IdQuery", e.getLocalizedMessage());
                }
            }
        });
@@ -169,7 +163,6 @@ public class CreateHome extends AppCompatActivity {
                                 Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
                                 changeActivity(MainActivity.class);
                             }else{
-                                Log.i("ERROR!!!!!!", e.getLocalizedMessage());
                                 Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                             }
                         }

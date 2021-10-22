@@ -64,7 +64,6 @@ public class MyTasks extends AppCompatActivity {
         taskListView = findViewById(R.id.taskListView);
 
         ParseQuery taskQuery = ParseQuery.getQuery("Tasks");
-        Log.i("Home object Id retrieved ", selectedHomeObjectId);
         taskQuery.whereEqualTo("Home", selectedHomeObjectId);
         taskQuery.whereEqualTo("assignToObjectId", ParseUser.getCurrentUser().getObjectId());
         taskQuery.findInBackground(new FindCallback() {

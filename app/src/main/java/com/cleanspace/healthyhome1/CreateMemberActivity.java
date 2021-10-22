@@ -46,7 +46,6 @@ public class CreateMemberActivity extends AppCompatActivity {
                EditText username = findViewById(R.id.userNameEditText);
                EditText email = findViewById(R.id.emailEditText);
                EditText password = findViewById(R.id.passwordEditText);
-               EditText conPassword = findViewById(R.id.confirmPasswordEditText);
 
                ParseUser user = new ParseUser();
 
@@ -65,7 +64,7 @@ public class CreateMemberActivity extends AppCompatActivity {
                user.signUpInBackground(new SignUpCallback() {
                    public void done(ParseException e) {
                        if (e == null) {
-                           Log.i("Session Token", user.getSessionToken());
+
                            Toast.makeText(getApplicationContext(),"Submitted Succefully", Toast.LENGTH_LONG).show();
 
                            /*
@@ -76,7 +75,6 @@ public class CreateMemberActivity extends AppCompatActivity {
                        } else {
                            // Sign up didn't succeed. Look at the ParseException
                            // to figure out what went wrong
-                           Log.i("Error!!!!!!", e.getLocalizedMessage());
                            Toast.makeText(getApplicationContext(),"Error: " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                        }
                    }
@@ -102,14 +100,12 @@ public class CreateMemberActivity extends AppCompatActivity {
             @Override
             public void done(ParseException e) {
                 if(e == null){
-                    Log.i("Logged out", "BYE!");
                     Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_LONG).show();
                     Button logoutButton = findViewById(R.id.logoutButton);
                     logoutButton.setVisibility(View.GONE);
                 } else {
                     // Sign up didn't succeed. Look at the ParseException
                     // to figure out what went wrong
-                    Log.i("Error logging out", e.getLocalizedMessage());
                     Toast.makeText(getApplicationContext(),"ERROR: error logging out", Toast.LENGTH_LONG).show();
                 }
             }
@@ -160,11 +156,9 @@ public class CreateMemberActivity extends AppCompatActivity {
                 @Override
                 public void done(ParseException e) {
                     if(e == null){
-                        Log.i("Logged out succesfully", "");
                         Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
                     }
                     else {
-                        Log.i("ERROR!!!", e.getLocalizedMessage());
                         Toast.makeText(getApplicationContext(),"Error logging out: "+ e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }

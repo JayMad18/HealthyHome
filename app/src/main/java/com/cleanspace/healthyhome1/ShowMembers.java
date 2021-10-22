@@ -101,7 +101,6 @@ public class ShowMembers extends AppCompatActivity {
                     membersListView.setAdapter(memberNamesAdapter);
                 }else{
                     Toast.makeText(getApplicationContext(),"Error loading members "+e.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
-                    Log.d("error loading homes",e.getLocalizedMessage());
                 }
             }
         });
@@ -119,7 +118,6 @@ public class ShowMembers extends AppCompatActivity {
                     Intent goBackToHomeScreen = new Intent(getApplicationContext(),HomeScreen.class);
                     goBackToHomeScreen.putExtra("HomeObjectID", selectedHomeObjectId);
                     startActivity(goBackToHomeScreen);
-
                 }
                 return false;
             }
@@ -145,7 +143,6 @@ public class ShowMembers extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
                     changeActivity(MainActivity.class);
                 }else{
-                    Log.i("ERROR!!!!!!", e.getLocalizedMessage());
                     Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
             }

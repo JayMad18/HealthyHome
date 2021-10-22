@@ -53,9 +53,6 @@ public class HomeScreen extends AppCompatActivity {
         retrieveSelectedHome();
     }
 
-
-
-
     /*
     * Creates and sends and Intent to start ShowMembers activity
     * Intent includes two Extra's, HomeObjectID and HomeName
@@ -114,7 +111,6 @@ public class HomeScreen extends AppCompatActivity {
                 }
                 else{
                     Toast.makeText(getApplicationContext(),"Error loading Home " + throwable.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                    Log.d("Error loading home", throwable.getLocalizedMessage());
                 }
             }
         });
@@ -160,7 +156,6 @@ public class HomeScreen extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
                     changeActivity(MainActivity.class);
                 }else{
-                    Log.i("ERROR!!!!!!", e.getLocalizedMessage());
                     Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
@@ -180,12 +175,12 @@ public class HomeScreen extends AppCompatActivity {
         try{
             //link to random quote api
             JSONObject jsonData = randomQuote.execute("https://api.quotable.io/random?maxLength=50").get();
-            Log.i("JSON data tostring", jsonData.toString());
             String content = jsonData.getString("content");
             String author = jsonData.getString("author");
             quoteView.setText(content + "\n"+ "-"+author);
         }catch (Exception e){
             e.printStackTrace();
+            quoteView.setText("Sorry, no quote available..");
         }
     }
 }
@@ -218,8 +213,7 @@ class DownloadRandomQuote extends AsyncTask<String, Void, JSONObject>{
                 e.printStackTrace();
             }
         }catch (Exception e) {
-            //e.printStackTrace();
-            Log.i("Failed at do in background", e.toString());
+            e.printStackTrace();
         }
         return null;
     }

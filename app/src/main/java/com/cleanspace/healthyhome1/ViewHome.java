@@ -55,9 +55,7 @@ public class ViewHome extends AppCompatActivity {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
 
         getHome(homeId);
-
     }
-
 
     /*
     * This method uses the homeId sent with the Intent in a query to find the particular Home's details
@@ -111,7 +109,6 @@ public class ViewHome extends AppCompatActivity {
                 }
                 else{
                     Toast.makeText(getApplicationContext(),e.getLocalizedMessage(),Toast.LENGTH_LONG).show();
-                    Log.i("Error searching home ID", e.getLocalizedMessage());
                 }
             }
         });
@@ -140,7 +137,6 @@ public class ViewHome extends AppCompatActivity {
                     }
                     else{
                         Toast.makeText(getApplicationContext(), user.getObjectId(),Toast.LENGTH_SHORT).show();
-                        Log.i("User Object ID saved", user.getObjectId());
                         saveHomeToArrayList(user, foundHomeObject);
                         populateListView();
                     }
@@ -149,7 +145,6 @@ public class ViewHome extends AppCompatActivity {
         }
         else{//self explanitory
             Toast.makeText(getApplicationContext(),"User already belongs to this home", Toast.LENGTH_SHORT).show();
-            Log.i("User Object ID rejected", user.getObjectId());
         }
 
     }
@@ -167,7 +162,6 @@ public class ViewHome extends AppCompatActivity {
             @Override
             public void done(ParseException e) {
                 if(e != null){
-                    Log.i("Error saving homesList to HomeList column", e.getLocalizedMessage());
                     Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
@@ -199,7 +193,6 @@ public class ViewHome extends AppCompatActivity {
                 }
                 else{
                     Toast.makeText(getApplicationContext(),e.getLocalizedMessage(),Toast.LENGTH_LONG).show();
-                    Log.i("Error getting task count", e.getLocalizedMessage());
                 }
             }
         });
@@ -220,7 +213,6 @@ public class ViewHome extends AppCompatActivity {
         query.findInBackground(new FindCallback<ParseUser>() {
             @Override
             public void done(List<ParseUser> objects, ParseException e) {
-                Log.i("Done",Integer.toString(objects.size())+" objects found in query");
                 if(e == null){
                     for(ParseUser object: objects){
                         if(!memberNames.contains(object.getUsername())){
@@ -230,8 +222,6 @@ public class ViewHome extends AppCompatActivity {
                     memberNamesAdapter.notifyDataSetChanged();
                     membersListView.setAdapter(memberNamesAdapter);
                     numberOfMembersView.setText("Number of members: " + Integer.toString(memberNames.size()));
-                }else{
-                    Log.i("Error updating listview", e.getLocalizedMessage());
                 }
             }
         });
