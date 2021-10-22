@@ -104,7 +104,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/GhostWhite"
-            app:menu="@menu/bottom_navigation_menu" />
+            app:menu="@menu/my_homes_bottom_nav" />
 
     </LinearLayout>
 

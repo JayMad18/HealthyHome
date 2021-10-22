@@ -74,7 +74,6 @@ BottomNavigationView bottomNavigationView;
                         Toast.makeText(getApplicationContext(),"returned objects list = null", Toast.LENGTH_SHORT).show();
                     }
                     else{
-                        Log.i("objects list size", Integer.toString(objects.size()));
                         for(ParseObject object: objects){
                             homeObjectsHomeName.add(object.getString("HomeName"));
                             homeObjectsIDs.add(object.getObjectId());
@@ -92,8 +91,12 @@ BottomNavigationView bottomNavigationView;
     /*
     * populates listview with homeObjectsHomeName
     * calls listViewItemClickListener
+    *    This "populateListView()" method has majority of work done in loadHomes() method
     * */
     public void populateListView(){
+        if(homeObjectsHomeName.size() == 0){
+            homeObjectsHomeName.add("You are not yet apart of any home.. :(");
+        }
         ArrayAdapter<String> memberObjectsAdapter = new ArrayAdapter<String>(this, R.layout.list_layout, R.id.list_content,homeObjectsHomeName);
         memberObjectsAdapter.notifyDataSetChanged();
         myHomesListView.setAdapter(memberObjectsAdapter);
@@ -105,7 +108,12 @@ BottomNavigationView bottomNavigationView;
         myHomesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                goToHomeThatWasSelected(HomeScreen.class, position);
+                if(homeObjectsHomeName.get(position).equals("You are not yet apart of any home.. :(")){
+                    changeActivity(CreateHome.class);
+                }
+                else{
+                    goToHomeThatWasSelected(HomeScreen.class, position);
+                }
             }
         });
     }

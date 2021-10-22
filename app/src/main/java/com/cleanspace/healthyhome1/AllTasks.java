@@ -60,22 +60,26 @@ public class AllTasks extends AppCompatActivity {
 
             }
 
+            //As far as I understand, the Object o must be a list object since I can cast it to an ArrayList..
             @Override
             public void done(Object o, Throwable throwable) {
                 if(throwable == null){
 
                     parseObjects = (ArrayList<ParseObject>) o;
 
-                    for(ParseObject object : parseObjects){
-                        taskList.add(object);
-                        taskNames.add(object.get("Name").toString());
-                        taskObjectIds.add(object.getObjectId());
-
+                    if(parseObjects.size() == 0){
+                        taskNames.add("No task's for this home yet..");
                     }
+                    else{
+                        for(ParseObject object : parseObjects){
+                            taskList.add(object);
+                            taskNames.add(object.get("Name").toString());
+                            taskObjectIds.add(object.getObjectId());
 
+                        }
+                    }
                     taskNamesAdapter.notifyDataSetChanged();
                     taskListView.setAdapter(taskNamesAdapter);
-
                 }
                 else{
                     Toast.makeText(getApplicationContext(),throwable.getLocalizedMessage(),Toast.LENGTH_SHORT).show();

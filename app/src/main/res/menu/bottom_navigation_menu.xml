@@ -5,11 +5,11 @@
         android:enabled="true"
         android:icon="@drawable/abc_vector_test"
         android:title="@string/bottem_nav_back"/>
-    <item
-        android:id="@+id/page_1"
-        android:enabled="true"
-        android:icon="@drawable/ic_home_black_24dp"
-        android:title="@string/bottem_nav_home"/>
+<!--    <item-->
+<!--        android:id="@+id/page_1"-->
+<!--        android:enabled="true"-->
+<!--        android:icon="@drawable/ic_home_black_24dp"-->
+<!--        android:title="@string/bottem_nav_home"/>-->
 <!--    <item-->
 <!--        android:id="@+id/page_2"-->
 <!--        android:enabled="true"-->

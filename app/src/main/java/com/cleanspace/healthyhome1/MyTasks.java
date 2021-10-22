@@ -46,23 +46,10 @@ public class MyTasks extends AppCompatActivity {
 
         selectedHomeObjectId = recievedIntent.getStringExtra("HomeObjectID");
         Log.i("loadUsersTasksForThisHome is being called", "!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        populateListView();
+        loadTasks();
     }
 
-    /**
-     * This method below will but put into the MyTasks activity
-     * TODO **TODO** still need to update the assigned member's list of task's.
-     *                           -solution: will update members list of tasks by
-     *                           querying task's containing user's objectId. This will
-     *                           take place everytime the member clicks on "MY TASKS"
-     *                           button.
-     */
-
-    public void populateListView(){
-
-        ArrayAdapter<String> taskNamesAdapter = new ArrayAdapter<String>(this, R.layout.list_layout, R.id.list_content,taskNames);
-        taskListView = findViewById(R.id.taskListView);
-
+    public void loadTasks(){
         ParseQuery taskQuery = ParseQuery.getQuery("Tasks");
         taskQuery.whereEqualTo("Home", selectedHomeObjectId);
         taskQuery.whereEqualTo("assignToObjectId", ParseUser.getCurrentUser().getObjectId());
@@ -82,13 +69,8 @@ public class MyTasks extends AppCompatActivity {
                         taskList.add(object);
                         taskNames.add(object.get("Name").toString());
                         taskObjectIds.add(object.getObjectId());
-
                     }
-
-                    taskNamesAdapter.notifyDataSetChanged();
-                    taskListView.setAdapter(taskNamesAdapter);
-                    updateUsersTaskList();
-
+                    populateListView();
                 }
                 else{
                     Toast.makeText(getApplicationContext(),throwable.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
@@ -96,6 +78,30 @@ public class MyTasks extends AppCompatActivity {
 
             }
         });
+    }
+
+    /**
+     * This method below will but put into the MyTasks activity
+     *
+     *                 still need to update the assigned member's list of task's.
+     *                           -solution: will update members list of tasks by
+     *                           querying task's containing user's objectId. This will
+     *                           take place everytime the member clicks on "MY TASKS"
+     *                           button. (Completed)
+     *
+     *      This "populateListView()" method does all the work when called
+     */
+    public void populateListView(){
+        taskListView = findViewById(R.id.taskListView);
+        if(taskNames.size() == 0){
+            taskNames.add("Looks like you have nothing to do!");
+        }
+        ArrayAdapter<String> taskNamesAdapter = new ArrayAdapter<String>(this, R.layout.list_layout, R.id.list_content,taskNames);
+        taskNamesAdapter.notifyDataSetChanged();
+        taskListView.setAdapter(taskNamesAdapter);
+        updateUsersTaskList();
+
+
     }
 
     //The users tasklist on the parse backend is updated during this activity.

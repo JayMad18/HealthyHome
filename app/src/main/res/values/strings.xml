@@ -13,8 +13,9 @@
     <integer name="layout_margin_top">20</integer>
 
     <string name="back4app_server_url">https://parseapi.back4app.com/</string>
-    <string name="back4app_app_id">auOLXbP0fvPzclP6IK3ibSXVRFEaDkiqdcCBGe1k</string>
-    <string name="back4app_client_key">DmN4g1wURrtd5mUXU39ePlbEptXGgfCfewr7jYue</string>
+    <string name="back4app_app_id">slFm5sIuxPAXYObV4otfOLdB2UO4Td16sksfdbd7</string>
+    <string name="back4app_client_key">EmuP6dIn1Y6B6BU46kJyPe4MjVcSrCiooxuZx3Ag</string>
+
     <string name="title_activity_my_tasks">MyTasks</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
