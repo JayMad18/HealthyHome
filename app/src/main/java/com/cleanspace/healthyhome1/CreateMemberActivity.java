@@ -17,6 +17,7 @@ import com.parse.LogOutCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.parse.SignUpCallback;
 
 import java.util.ArrayList;
@@ -63,15 +64,23 @@ public class CreateMemberActivity extends AppCompatActivity {
                //ParseUser class method to sign up
                user.signUpInBackground(new SignUpCallback() {
                    public void done(ParseException e) {
-                       if (e == null) {
+                       if (e == null) {user.put("isLoggedIn", true);
+                           user.saveInBackground(new SaveCallback() {
+                               @Override
+                               public void done(ParseException e) {
+                                   if(e == null){
+                                       Toast.makeText(getApplicationContext(),"Submitted Succefully", Toast.LENGTH_LONG).show();
 
-                           Toast.makeText(getApplicationContext(),"Submitted Succefully", Toast.LENGTH_LONG).show();
+                                       /*
+                                        *  -we dont have to send any extra data containing info to identify the current user since
+                                        *   now that the user is created and logged in, we can use the ParseUser.getCurrentUser() method to get the current user.
+                                        * */
+                                       changeActivity(Homes.class);
+                                   }
+                               }
+                           });
 
-                           /*
-                           *  -we dont have to send any extra data containing info to identify the current user since
-                           *   now that the user is created and logged in, we can use the ParseUser.getCurrentUser() method to get the current user.
-                           * */
-                           changeActivity(Homes.class);
+
                        } else {
                            // Sign up didn't succeed. Look at the ParseException
                            // to figure out what went wrong

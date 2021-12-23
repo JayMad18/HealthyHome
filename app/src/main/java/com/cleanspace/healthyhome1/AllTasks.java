@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -45,6 +47,7 @@ public class AllTasks extends AppCompatActivity {
 
         selectedHomeObjectId = recievedIntent.getStringExtra("HomeObjectID");
         populateListView();
+        onItemClickListener();
     }
 
     public void populateListView(){
@@ -85,6 +88,28 @@ public class AllTasks extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(),throwable.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
                 }
 
+            }
+        });
+    }
+    public void onItemClickListener(){
+        taskListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent sendTaskInfo = new Intent(getApplicationContext(), TaskInfo.class);
+
+                ParseObject selectedTask = taskList.get(position);
+
+                sendTaskInfo.putExtra("Name", selectedTask.get("Name").toString());
+                sendTaskInfo.putExtra("details",selectedTask.get("details").toString());
+                sendTaskInfo.putExtra("HomeObjectID", selectedTask.get("Home").toString());
+                sendTaskInfo.putExtra("isAssigned", selectedTask.getBoolean("isAssigned"));
+                if(selectedTask.getBoolean("isAssigned")){
+                    sendTaskInfo.putExtra("assignedTo", selectedTask.get("assignToObjectId").toString());
+                }
+                sendTaskInfo.putExtra("dateTaskCreated", selectedTask.getCreatedAt().toString());
+                sendTaskInfo.putExtra("sender", "AllTasks");
+                //selected user needs a session token to use .getEmail(), which means only logged in user can use .getEmail()
+                startActivity(sendTaskInfo);
             }
         });
     }

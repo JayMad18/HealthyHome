@@ -13,6 +13,7 @@ import com.parse.LogInCallback;
 import com.parse.LogOutCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -38,8 +39,17 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void done(ParseUser user, ParseException e) {
                 if(e == null){
-                    changeActivity(Homes.class);
-                    Toast.makeText(getApplicationContext(),"Logged In", Toast.LENGTH_SHORT).show();
+                    user.put("isLoggedIn", true);
+                    user.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if(e == null){
+                                changeActivity(Homes.class);
+                                Toast.makeText(getApplicationContext(),"Logged In", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+
                 }
                 else{
                     Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();

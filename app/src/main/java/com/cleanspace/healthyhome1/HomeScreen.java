@@ -24,6 +24,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import org.json.JSONObject;
 
@@ -42,6 +43,8 @@ public class HomeScreen extends AppCompatActivity {
 
     Intent retrievedHome;
 
+    ParseUser user;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +54,7 @@ public class HomeScreen extends AppCompatActivity {
         generateQuote();
         setBottomNavListener();
         retrieveSelectedHome();
+        user = ParseUser.getCurrentUser();
     }
 
     /*
@@ -149,14 +153,29 @@ public class HomeScreen extends AppCompatActivity {
     }
     //logout in its own method
     public void logout(){
-        ParseUser.logOutInBackground(new LogOutCallback() {
+        user.put("isLoggedIn",false);
+        user.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if(e == null){
-                    Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
-                    changeActivity(MainActivity.class);
-                }else{
-                    Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                    ParseUser.logOutInBackground(new LogOutCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if(e == null){
+                                Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
+                                changeActivity(MainActivity.class);
+                            }else{
+                                user.put("isLoggedIn",true);
+                                user.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
                 }
             }
         });
