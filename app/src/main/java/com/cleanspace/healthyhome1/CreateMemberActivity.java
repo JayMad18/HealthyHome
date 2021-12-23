@@ -69,7 +69,6 @@ public class CreateMemberActivity extends AppCompatActivity {
                                @Override
                                public void done(ParseException e) {
                                    if(e == null){
-                                       Toast.makeText(getApplicationContext(),"Submitted Succefully", Toast.LENGTH_LONG).show();
 
                                        /*
                                         *  -we dont have to send any extra data containing info to identify the current user since
@@ -84,17 +83,14 @@ public class CreateMemberActivity extends AppCompatActivity {
                        } else {
                            // Sign up didn't succeed. Look at the ParseException
                            // to figure out what went wrong
-                           Toast.makeText(getApplicationContext(),"Error: " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                        }
                    }
                });
            }
            else{
-               Toast.makeText(getApplicationContext(),"Passwords do not match!", Toast.LENGTH_LONG).show();
            }
        }
        else{
-           Toast.makeText(getApplicationContext(),"Please fill out all text fields", Toast.LENGTH_LONG).show();
        }
     }
     //Switches to the MainActivty acticity
@@ -109,13 +105,11 @@ public class CreateMemberActivity extends AppCompatActivity {
             @Override
             public void done(ParseException e) {
                 if(e == null){
-                    Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_LONG).show();
                     Button logoutButton = findViewById(R.id.logoutButton);
                     logoutButton.setVisibility(View.GONE);
                 } else {
                     // Sign up didn't succeed. Look at the ParseException
                     // to figure out what went wrong
-                    Toast.makeText(getApplicationContext(),"ERROR: error logging out", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -165,10 +159,8 @@ public class CreateMemberActivity extends AppCompatActivity {
                 @Override
                 public void done(ParseException e) {
                     if(e == null){
-                        Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
                     }
                     else {
-                        Toast.makeText(getApplicationContext(),"Error logging out: "+ e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }
             });

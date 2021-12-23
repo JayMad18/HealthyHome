@@ -115,7 +115,6 @@ public class ViewHome extends AppCompatActivity {
             public void done(List<ParseObject> objects, ParseException e) {
                 if(e == null){
 
-                    Toast.makeText(getApplicationContext(),"Home found", Toast.LENGTH_SHORT).show();
 
                     //Getting the first home object found until uniqueID is solved.
 
@@ -149,7 +148,6 @@ public class ViewHome extends AppCompatActivity {
 
                 }
                 else{
-                    Toast.makeText(getApplicationContext(),e.getLocalizedMessage(),Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -174,10 +172,8 @@ public class ViewHome extends AppCompatActivity {
                 @Override
                 public void done(ParseException e) {
                     if(e != null){
-                        Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                     }
                     else{
-                        Toast.makeText(getApplicationContext(), user.getObjectId(),Toast.LENGTH_SHORT).show();
                         saveHomeToArrayList(user, foundHomeObject);
 
                     }
@@ -185,7 +181,6 @@ public class ViewHome extends AppCompatActivity {
             });
         }
         else{//self explanitory
-            Toast.makeText(getApplicationContext(),"User already belongs to this home", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -202,7 +197,6 @@ public class ViewHome extends AppCompatActivity {
             @Override
             public void done(ParseException e) {
                 if(e != null){
-                    Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
                 else{
                     subscribeToHomeFCMTopic();
@@ -221,7 +215,6 @@ public class ViewHome extends AppCompatActivity {
                         if (!task.isSuccessful()) {
                             msg = "Subscribe to home failed";
                         }
-                        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
                         TOPIC = "/topics/"+foundHomeObject.getObjectId() + "TOPIC";
                         buildJSONMessageObject();
                         //loadRegistrationTokens();
@@ -239,7 +232,6 @@ public class ViewHome extends AppCompatActivity {
 //            @Override
 //            public void done(List<ParseUser> objects, ParseException e) {
 //                if(e == null){
-//                    Log.i("query session size", Integer.toString(objects.size()));
 //                    if(objects.size() > 0){
 //                        for(ParseUser member : objects){
 //                            ArrayList<String> homeList = (ArrayList<String>) member.get("HomeList");
@@ -289,7 +281,6 @@ public class ViewHome extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(), "Request error", Toast.LENGTH_LONG).show();
             }
         }){
             @Override
@@ -329,7 +320,6 @@ public class ViewHome extends AppCompatActivity {
                     numberOfTasksView.setText("Number of tasks created: " + Integer.toString(objects.size()));
                 }
                 else{
-                    Toast.makeText(getApplicationContext(),e.getLocalizedMessage(),Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -366,7 +356,6 @@ public class ViewHome extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //TODO this is where the code will go that will display the members info when clivked on.
-                Toast.makeText(getApplicationContext(), memberNames.get(position), Toast.LENGTH_SHORT).show();
             }
         });
     }

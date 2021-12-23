@@ -106,15 +106,12 @@ public class HomeScreen extends AppCompatActivity {
             public void done(Object o, Throwable throwable) {
                 if(throwable == null){
                     if(o == null){
-                        Toast.makeText(getApplicationContext(),"No Home Found", Toast.LENGTH_SHORT).show();
                     }else{
                         selectedHome = (ParseObject) o;
-                        Toast.makeText(getApplicationContext(),selectedHome.get("HomeName").toString(), Toast.LENGTH_SHORT).show();
                     }
 
                 }
                 else{
-                    Toast.makeText(getApplicationContext(),"Error loading Home " + throwable.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -162,17 +159,14 @@ public class HomeScreen extends AppCompatActivity {
                         @Override
                         public void done(ParseException e) {
                             if(e == null){
-                                Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
                                 changeActivity(MainActivity.class);
                             }else{
                                 user.put("isLoggedIn",true);
                                 user.saveInBackground(new SaveCallback() {
                                     @Override
                                     public void done(ParseException e) {
-                                        Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                                     }
                                 });
-                                Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                             }
                         }
                     });

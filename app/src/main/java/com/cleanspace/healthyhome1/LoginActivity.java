@@ -45,14 +45,12 @@ public class LoginActivity extends AppCompatActivity {
                         public void done(ParseException e) {
                             if(e == null){
                                 changeActivity(Homes.class);
-                                Toast.makeText(getApplicationContext(),"Logged In", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
 
                 }
                 else{
-                    Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -82,10 +80,8 @@ public class LoginActivity extends AppCompatActivity {
                @Override
                public void done(ParseException e) {
                    if(e == null){
-                       Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
                    }
                    else {
-                       Toast.makeText(getApplicationContext(),"Error logging out: "+ e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                    }
                }
            });

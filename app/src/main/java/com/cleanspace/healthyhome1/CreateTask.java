@@ -118,7 +118,6 @@ public class CreateTask extends AppCompatActivity {
                     task = new ParseObject("Tasks");
                 }
                 else {
-                    Toast.makeText(getApplicationContext(),e.getLocalizedMessage(),Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -156,21 +155,18 @@ public class CreateTask extends AppCompatActivity {
             public void done(ParseException e) {
                 if(e == null){
                     if(isAssigned){
-                        Toast.makeText(CreateTask.this, "Task created and assigned to " + memberObjects.get(position).get("name"), Toast.LENGTH_SHORT).show();
                         taskHasObjectId = true;
                         buildJSONMessageObject(isAssigned);
                         changeActivity(HomeScreen.class);
 
                     }
                     else{
-                        Toast.makeText(CreateTask.this, "Task created succesfully", Toast.LENGTH_SHORT).show();
                         buildJSONMessageObject(isAssigned);
                         changeActivity(HomeScreen.class);
 
                     }
                 }
                 else{
-                    Toast.makeText(CreateTask.this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -193,7 +189,6 @@ public class CreateTask extends AppCompatActivity {
                     memberNamesAdapter.notifyDataSetChanged();
                     membersListView.setAdapter(memberNamesAdapter);
                 }else{
-                    Toast.makeText(getApplicationContext(),"Error loading members "+e.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -203,7 +198,6 @@ public class CreateTask extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(taskNameEditText.getText().length() == 0){
-                    Toast.makeText(CreateTask.this, "You have not created a name for your task yet.", Toast.LENGTH_LONG).show();
                 }
                 else{
                     confirmAssignTaskToMember(position);
@@ -219,7 +213,6 @@ public class CreateTask extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                                 isAssigned = true;
                                 assignedMember = memberObjects.get(position);
-                                Toast.makeText(getApplicationContext(),memberObjects.get(position).get("name") + " has been assigned!",Toast.LENGTH_SHORT).show();
                     }
                 }).setNegativeButton("Don't assign", null).show();
     }
@@ -261,17 +254,14 @@ public class CreateTask extends AppCompatActivity {
 //                        @Override
 //                        public void done(ParseException e) {
 //                            if(e == null){
-//                                Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
 //                                changeActivity(MainActivity.class);
 //                            }else{
 //                                user.put("isLoggedIn",true);
 //                                user.saveInBackground(new SaveCallback() {
 //                                    @Override
 //                                    public void done(ParseException e) {
-//                                        Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
 //                                    }
 //                                });
-//                                Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
 //                            }
 //                        }
 //                    });
@@ -296,7 +286,6 @@ public class CreateTask extends AppCompatActivity {
 //            @Override
 //            public void done(List<ParseUser> objects, ParseException e) {
 //                if(e == null){
-//                    Log.i("query session size", Integer.toString(objects.size()));
 //                    if(objects.size() > 0){
 //                        for(ParseUser member : objects){
 //                            ArrayList<String> homeList = (ArrayList<String>) member.get("HomeList");
@@ -329,7 +318,6 @@ public class CreateTask extends AppCompatActivity {
                 //notification.put("registration_ids",registrationTokens);
                 notification.put("data", notificationBody);
             } catch ( JSONException e) {
-                Toast.makeText(getApplicationContext(),"error building notification...",Toast.LENGTH_SHORT);
             }
         }
         else{
@@ -341,7 +329,6 @@ public class CreateTask extends AppCompatActivity {
                 //notification.put("registration_ids",registrationTokens);
                 notification.put("data", notificationBody);
             } catch ( JSONException e) {
-                Toast.makeText(getApplicationContext(),"error building notification...",Toast.LENGTH_SHORT);
             }
         }
 
@@ -364,7 +351,6 @@ public class CreateTask extends AppCompatActivity {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(), " error..", Toast.LENGTH_LONG).show();
             }
         }){
             @Override
@@ -396,10 +382,8 @@ public class CreateTask extends AppCompatActivity {
     boolean isKeyboardShowing = false;
     void onKeyboardVisibilityChanged(boolean opened) {
 //        if(opened == false){
-//            // Toast.makeText(getApplicationContext(),"False",Toast.LENGTH_LONG).show();
 //        }
 //        else{
-//            // Toast.makeText(getApplicationContext(),"True",Toast.LENGTH_LONG).show();
 //        }
 
     }

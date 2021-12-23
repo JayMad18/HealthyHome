@@ -57,11 +57,8 @@ public class TaskInfo extends AppCompatActivity {
 
                 @Override
                 public void done(Object o, Throwable throwable) {
-                    Log.d("O", "O");
                     if(throwable == null){
-                        Log.d("RECIEVED OBJECT", o.toString());
                         ArrayList<ParseUser> parseUsersArrayList = (ArrayList<ParseUser>) o;
-//                        Log.d("size of Object o", Integer.toString(parseUsersArrayList.size()));
                         assignedToObject = (ParseUser) parseUsersArrayList.get(0);
                         assignedToTextView.setText("assigned to: "+assignedToObject.get("name").toString());
                     }

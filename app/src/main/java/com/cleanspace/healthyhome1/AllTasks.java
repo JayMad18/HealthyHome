@@ -85,7 +85,6 @@ public class AllTasks extends AppCompatActivity {
                     taskListView.setAdapter(taskNamesAdapter);
                 }
                 else{
-                    Toast.makeText(getApplicationContext(),throwable.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
                 }
 
             }

@@ -76,15 +76,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         // TODO(developer): Handle FCM messages here.
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
-        Log.d("JAYMAD!!!!!!!!", "From: " + remoteMessage.getFrom());
 
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
-            Log.d(TAG, "Message data payload: " + remoteMessage.getData());
             constructNotificationFromMessage(remoteMessage);
 //            if (/* Check if data needs to be processed by long running job */ true) {
 //                // For long-running tasks (10 seconds or more) use WorkManager.
-//                Log.d("JAY MAD!!!, Check MyFCM class","The data needs to be processed by long running job");
 //                //scheduleJob();
 //            } else {
 //                // Handle message within 10 seconds
@@ -95,7 +92,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
-            Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
             constructNotificationFromMessage(remoteMessage);
         }
 
@@ -117,7 +113,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
      */
     @Override
     public void onNewToken(String token) {
-        Log.d(TAG, "Refreshed token: " + token);
 
         // If you want to send messages to this application instance or
         // manage this apps subscriptions on the server side, send the
@@ -145,7 +140,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
      */
     private void handleNow(RemoteMessage remoteMessage) {
         constructNotificationFromMessage(remoteMessage);
-        Log.d(TAG, "Short lived task is done.");
     }
 
     /**
@@ -163,12 +157,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             @Override
             public void done(ParseException e) {
                 if(e == null){
-                    Log.i("Token","New token generated and sent to parse server");
-                    Toast.makeText(getApplicationContext(),"New FCM device token generated",Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    Log.i("Token",e.getLocalizedMessage());
-                    Toast.makeText(getApplicationContext(),e.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
                 }
             }
         });

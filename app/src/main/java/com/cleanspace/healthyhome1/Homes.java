@@ -67,16 +67,12 @@ public class Homes extends AppCompatActivity {
 //                //if no objects found matching query then method throws exception
 //                if(e == null){
 //                    //Homes containing member was found
-//                    Log.i("TEST","TEST");
-//                    Toast.makeText(getApplicationContext(),"User is only allowed one home temporarily", Toast.LENGTH_SHORT).show();
 //                }
 //                else{
 //                    if(e.getLocalizedMessage().equals("no results found for query")){
 //                        changeActivity(CreateHome.class);
 //                    }
 //                    else{
-//                        Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-//                        Log.i("Exeption thrown", e.getLocalizedMessage());
 //                    }
 //                }
 //            }
@@ -107,14 +103,12 @@ public class Homes extends AppCompatActivity {
                         foundHomeName += objects.get(0).getString("HomeName") + "\n";
                     }
                     else{
-                        Toast.makeText(getApplicationContext(),"No home found by that ID", Toast.LENGTH_SHORT).show();
                     }
 
                     resultsView.setText(foundHomeName);
                     resultsView.setVisibility(View.VISIBLE);
                 }
                 else{
-                    Toast.makeText(getApplicationContext(),e.getLocalizedMessage(),Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -176,17 +170,14 @@ public class Homes extends AppCompatActivity {
                         @Override
                         public void done(ParseException e) {
                             if(e == null){
-                                Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
                                 changeActivity(MainActivity.class);
                             }else{
                                 user.put("isLoggedIn",true);
                                 user.saveInBackground(new SaveCallback() {
                                     @Override
                                     public void done(ParseException e) {
-                                        Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                                     }
                                 });
-                                Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
@@ -223,7 +214,6 @@ public class Homes extends AppCompatActivity {
 
                         // Log and toast
                         String msg = token.toString();
-                        //Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
                         sendTokenToServer(token);
                     }
                 });
@@ -236,10 +226,8 @@ public class Homes extends AppCompatActivity {
             @Override
             public void done(ParseException e) {
                 if(e == null){
-                    //Toast.makeText(getApplicationContext(),"New FCM device token generated",Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    Toast.makeText(getApplicationContext(),e.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
                 }
             }
         });

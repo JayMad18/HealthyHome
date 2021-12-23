@@ -68,10 +68,8 @@ BottomNavigationView bottomNavigationView;
                     //I dont know why I included this check because the callback would have thrown an exception if ParseUser.getCurrentUser() == null
                     //matter of fact it would not have had any objectId to search.
                     if(ParseUser.getCurrentUser() == null){
-                        Toast.makeText(getApplicationContext(),"getCurrentUser = null", Toast.LENGTH_SHORT).show();
                     }//I think these were just over-cautionary checks
                     else if(objects == null){
-                        Toast.makeText(getApplicationContext(),"returned objects list = null", Toast.LENGTH_SHORT).show();
                     }
                     else{
                         for(ParseObject object: objects){
@@ -83,7 +81,6 @@ BottomNavigationView bottomNavigationView;
                     }
                 }
                 else{
-                    Toast.makeText(getApplicationContext(),e.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
                 }
             }
         });

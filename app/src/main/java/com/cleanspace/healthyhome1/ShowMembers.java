@@ -104,7 +104,6 @@ public class ShowMembers extends AppCompatActivity {
                     memberNamesAdapter.notifyDataSetChanged();
                     membersListView.setAdapter(memberNamesAdapter);
                 }else{
-                    Toast.makeText(getApplicationContext(),"Error loading members "+e.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -149,17 +148,14 @@ public class ShowMembers extends AppCompatActivity {
                         @Override
                         public void done(ParseException e) {
                             if(e == null){
-                                Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
                                 changeActivity(MainActivity.class);
                             }else{
                                 user.put("isLoggedIn",true);
                                 user.saveInBackground(new SaveCallback() {
                                     @Override
                                     public void done(ParseException e) {
-                                        Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                                     }
                                 });
-                                Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                             }
                         }
                     });

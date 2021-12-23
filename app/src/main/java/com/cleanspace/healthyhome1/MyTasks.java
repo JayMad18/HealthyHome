@@ -47,7 +47,6 @@ public class MyTasks extends AppCompatActivity {
         recievedIntent = getIntent();
 
         selectedHomeObjectId = recievedIntent.getStringExtra("HomeObjectID");
-        Log.i("loadUsersTasksForThisHome is being called", "!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         loadTasks();
 
     }
@@ -76,7 +75,6 @@ public class MyTasks extends AppCompatActivity {
                     populateListView();
                 }
                 else{
-                    Toast.makeText(getApplicationContext(),throwable.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -118,11 +116,9 @@ public class MyTasks extends AppCompatActivity {
             @Override
             public void done(ParseException e) {
                 if(e == null){
-                    //Toast.makeText(getApplicationContext(),"task list updated", Toast.LENGTH_SHORT).show();
                     onItemClickListener();
                 }
                 else{
-                    Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         });

@@ -69,7 +69,6 @@ public class CreateHome extends AppCompatActivity {
             @Override
             public void done(ParseException e) {
                 if(e != null){
-                    Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
                 else {
                     saveHomeToArrayList(user, home);
@@ -94,10 +93,8 @@ public class CreateHome extends AppCompatActivity {
             @Override
             public void done(ParseException e) {
                 if(e != null){
-                    Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    Toast.makeText(getApplicationContext(),homeName.getText().toString() +" created succesfully!" +" home id:" + home.get("ID"), Toast.LENGTH_SHORT).show();
                     Intent homeScreen = new Intent(getApplicationContext(),HomeScreen.class);
                     homeScreen.putExtra("HomeObjectID", home.getObjectId());
                     subscribeToHomeFCMTopic(home.getObjectId());
@@ -167,17 +164,14 @@ public class CreateHome extends AppCompatActivity {
                                     @Override
                                     public void done(ParseException e) {
                                         if(e == null){
-                                            Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
                                             changeActivity(MainActivity.class);
                                         }else{
                                             user.put("isLoggedIn",true);
                                             user.saveInBackground(new SaveCallback() {
                                                 @Override
                                                 public void done(ParseException e) {
-                                                    Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                                                 }
                                             });
-                                            Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 });
@@ -200,7 +194,6 @@ public class CreateHome extends AppCompatActivity {
                         if (!task.isSuccessful()) {
                             msg = "Subscribe to home failed";
                         }
-                        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
 //                        TOPIC = "/topics/"+homeObjectId + "TOPIC";
 //                        loadRegistrationTokens();
                     }
