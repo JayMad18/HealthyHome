@@ -15,7 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.LogOutCallback;
@@ -33,6 +36,7 @@ public class CreateHome extends AppCompatActivity {
     BottomNavigationView bottomNavigationView;
     public Boolean isUnique;
     public ArrayList<String> currentExistingHomeIDs = new ArrayList<String>();
+    ParseUser user;
 
     //also sets logout listener in bottomNav
     @Override
@@ -40,6 +44,7 @@ public class CreateHome extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_home);
         setLogoutListener();
+        user = ParseUser.getCurrentUser();
     }
 
     /*
@@ -51,8 +56,6 @@ public class CreateHome extends AppCompatActivity {
     public void saveHomeToDataBase(String id) throws JSONException {
         EditText homeName = findViewById(R.id.homeNameEditText);
         ParseObject home = new ParseObject("Homes");
-        ParseUser user = ParseUser.getCurrentUser();
-
 
         //creates an arraylist and adds the current active user then adds arraylist to MembersList column
         ArrayList<String> membersList = new ArrayList<String>();
@@ -66,8 +69,6 @@ public class CreateHome extends AppCompatActivity {
             @Override
             public void done(ParseException e) {
                 if(e != null){
-                    Log.i("Error saving Members to array", e.getLocalizedMessage());
-                    Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
                 else {
                     saveHomeToArrayList(user, home);
@@ -92,13 +93,11 @@ public class CreateHome extends AppCompatActivity {
             @Override
             public void done(ParseException e) {
                 if(e != null){
-                    Log.i("Error saving homesList to HomeList column", e.getLocalizedMessage());
-                    Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    Toast.makeText(getApplicationContext(),homeName.getText().toString() +" created succesfully!" +" home id:" + home.get("ID"), Toast.LENGTH_SHORT).show();
                     Intent homeScreen = new Intent(getApplicationContext(),HomeScreen.class);
                     homeScreen.putExtra("HomeObjectID", home.getObjectId());
+                    subscribeToHomeFCMTopic(home.getObjectId());
                     startActivity(homeScreen);
                 }
             }
@@ -130,14 +129,8 @@ public class CreateHome extends AppCompatActivity {
                        }
                    }
                    else{
-                       for(ParseObject object: objects){
-                           Log.i("Id that was caught from query", object.getString("ID"));
-                       }
                        generateUniqueId(view);
                    }
-               }
-               else{
-                   Log.i("Error @ IdQuery", e.getLocalizedMessage());
                }
            }
        });
@@ -162,23 +155,51 @@ public class CreateHome extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 if(item.getItemId() == R.id.logoutItem){
-                    ParseUser.logOutInBackground(new LogOutCallback() {
+                    user.put("isLoggedIn",false);
+                    user.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
                             if(e == null){
-                                Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
-                                changeActivity(MainActivity.class);
-                            }else{
-                                Log.i("ERROR!!!!!!", e.getLocalizedMessage());
-                                Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                                ParseUser.logOutInBackground(new LogOutCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if(e == null){
+                                            changeActivity(MainActivity.class);
+                                        }else{
+                                            user.put("isLoggedIn",true);
+                                            user.saveInBackground(new SaveCallback() {
+                                                @Override
+                                                public void done(ParseException e) {
+                                                }
+                                            });
+                                        }
+                                    }
+                                });
                             }
                         }
                     });
+
                 }
                 return false;
             }
         });
     }
+
+    public void subscribeToHomeFCMTopic(String homeObjectId){
+        FirebaseMessaging.getInstance().subscribeToTopic("/topics/"+ homeObjectId + "TOPIC")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        String msg = "subscribe to home success";
+                        if (!task.isSuccessful()) {
+                            msg = "Subscribe to home failed";
+                        }
+//                        TOPIC = "/topics/"+homeObjectId + "TOPIC";
+//                        loadRegistrationTokens();
+                    }
+                });
+    }
+
     //helper method to quickly go back to Homes activity
     public void goBack(View view){
         changeActivity(Homes.class);

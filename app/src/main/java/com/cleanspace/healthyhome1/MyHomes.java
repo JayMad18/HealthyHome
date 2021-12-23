@@ -68,15 +68,10 @@ BottomNavigationView bottomNavigationView;
                     //I dont know why I included this check because the callback would have thrown an exception if ParseUser.getCurrentUser() == null
                     //matter of fact it would not have had any objectId to search.
                     if(ParseUser.getCurrentUser() == null){
-                        Toast.makeText(getApplicationContext(),"getCurrentUser = null", Toast.LENGTH_SHORT).show();
-                        Log.i("user = null", "User null");
                     }//I think these were just over-cautionary checks
                     else if(objects == null){
-                        Toast.makeText(getApplicationContext(),"returned objects list = null", Toast.LENGTH_SHORT).show();
-                        Log.i("objects = null", e.getLocalizedMessage());
                     }
                     else{
-                        Log.i("objects list size", Integer.toString(objects.size()));
                         for(ParseObject object: objects){
                             homeObjectsHomeName.add(object.getString("HomeName"));
                             homeObjectsIDs.add(object.getObjectId());
@@ -86,8 +81,6 @@ BottomNavigationView bottomNavigationView;
                     }
                 }
                 else{
-                    Log.i("Error loading homes into memberObjects arraylist", e.getLocalizedMessage());
-                    Toast.makeText(getApplicationContext(),e.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -95,8 +88,12 @@ BottomNavigationView bottomNavigationView;
     /*
     * populates listview with homeObjectsHomeName
     * calls listViewItemClickListener
+    *    This "populateListView()" method has majority of work done in loadHomes() method
     * */
     public void populateListView(){
+        if(homeObjectsHomeName.size() == 0){
+            homeObjectsHomeName.add("You are not yet apart of any home.. :(");
+        }
         ArrayAdapter<String> memberObjectsAdapter = new ArrayAdapter<String>(this, R.layout.list_layout, R.id.list_content,homeObjectsHomeName);
         memberObjectsAdapter.notifyDataSetChanged();
         myHomesListView.setAdapter(memberObjectsAdapter);
@@ -108,7 +105,12 @@ BottomNavigationView bottomNavigationView;
         myHomesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                goToHomeThatWasSelected(HomeScreen.class, position);
+                if(homeObjectsHomeName.get(position).equals("You are not yet apart of any home.. :(")){
+                    changeActivity(CreateHome.class);
+                }
+                else{
+                    goToHomeThatWasSelected(HomeScreen.class, position);
+                }
             }
         });
     }

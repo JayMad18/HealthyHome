@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -45,26 +47,12 @@ public class MyTasks extends AppCompatActivity {
         recievedIntent = getIntent();
 
         selectedHomeObjectId = recievedIntent.getStringExtra("HomeObjectID");
-        Log.i("loadUsersTasksForThisHome is being called", "!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        populateListView();
+        loadTasks();
+
     }
 
-    /**
-     * This method below will but put into the MyTasks activity
-     * TODO **TODO** still need to update the assigned member's list of task's.
-     *                           -solution: will update members list of tasks by
-     *                           querying task's containing user's objectId. This will
-     *                           take place everytime the member clicks on "MY TASKS"
-     *                           button.
-     */
-
-    public void populateListView(){
-
-        ArrayAdapter<String> taskNamesAdapter = new ArrayAdapter<String>(this, R.layout.list_layout, R.id.list_content,taskNames);
-        taskListView = findViewById(R.id.taskListView);
-
+    public void loadTasks(){
         ParseQuery taskQuery = ParseQuery.getQuery("Tasks");
-        Log.i("Home object Id retrieved ", selectedHomeObjectId);
         taskQuery.whereEqualTo("Home", selectedHomeObjectId);
         taskQuery.whereEqualTo("assignToObjectId", ParseUser.getCurrentUser().getObjectId());
         taskQuery.findInBackground(new FindCallback() {
@@ -83,20 +71,42 @@ public class MyTasks extends AppCompatActivity {
                         taskList.add(object);
                         taskNames.add(object.get("Name").toString());
                         taskObjectIds.add(object.getObjectId());
-
                     }
-
-                    taskNamesAdapter.notifyDataSetChanged();
-                    taskListView.setAdapter(taskNamesAdapter);
-                    updateUsersTaskList();
-
+                    populateListView();
                 }
                 else{
-                    Toast.makeText(getApplicationContext(),throwable.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
                 }
 
             }
         });
+    }
+
+    /**
+     * This method below will but put into the MyTasks activity
+     *
+     *                 still need to update the assigned member's list of task's.
+     *                           -solution: will update members list of tasks by
+     *                           querying task's containing user's objectId. This will
+     *                           take place everytime the member clicks on "MY TASKS"
+     *                           button. (Completed)
+     *
+     *      This "populateListView()" method does all the work when called
+     */
+    public void populateListView(){
+        taskListView = findViewById(R.id.taskListView);
+        ArrayAdapter<String> taskNamesAdapter = new ArrayAdapter<String>(this, R.layout.list_layout, R.id.list_content,taskNames);
+        taskNamesAdapter.notifyDataSetChanged();
+        taskListView.setAdapter(taskNamesAdapter);
+        if(taskNames.size() == 0){
+            taskNames.add("Looks like you have nothing to do!");
+        }
+        else {
+            updateUsersTaskList();
+        }
+
+
+
+
     }
 
     //The users tasklist on the parse backend is updated during this activity.
@@ -106,11 +116,32 @@ public class MyTasks extends AppCompatActivity {
             @Override
             public void done(ParseException e) {
                 if(e == null){
-                    Toast.makeText(getApplicationContext(),"task list updated", Toast.LENGTH_SHORT).show();
+                    onItemClickListener();
                 }
                 else{
-                    Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+    }
+    public void onItemClickListener(){
+        taskListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent sendTaskInfo = new Intent(getApplicationContext(), TaskInfo.class);
+
+                ParseObject selectedTask = taskList.get(position);
+
+                sendTaskInfo.putExtra("Name", selectedTask.get("Name").toString());
+                sendTaskInfo.putExtra("details",selectedTask.get("details").toString());
+                sendTaskInfo.putExtra("HomeObjectID", selectedTask.get("Home").toString());
+                sendTaskInfo.putExtra("isAssigned", selectedTask.getBoolean("isAssigned"));
+                if(selectedTask.getBoolean("isAssigned")){
+                    sendTaskInfo.putExtra("assignedTo", selectedTask.get("assignToObjectId").toString());
+                }
+                sendTaskInfo.putExtra("dateTaskCreated", selectedTask.getCreatedAt().toString());
+                sendTaskInfo.putExtra("sender", "MyTasks");
+                //selected user needs a session token to use .getEmail(), which means only logged in user can use .getEmail()
+                startActivity(sendTaskInfo);
             }
         });
     }

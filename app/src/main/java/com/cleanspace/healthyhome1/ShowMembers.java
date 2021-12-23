@@ -23,6 +23,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,10 +39,13 @@ public class ShowMembers extends AppCompatActivity {
 
     Intent homeObjectId;
 
+    ParseUser user;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_members);
+        user = ParseUser.getCurrentUser();
         /*
         * Takes data sent from intent to search for user's that belong to the home
         * */
@@ -100,8 +104,6 @@ public class ShowMembers extends AppCompatActivity {
                     memberNamesAdapter.notifyDataSetChanged();
                     membersListView.setAdapter(memberNamesAdapter);
                 }else{
-                    Toast.makeText(getApplicationContext(),"Error loading members "+e.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
-                    Log.d("error loading homes",e.getLocalizedMessage());
                 }
             }
         });
@@ -119,7 +121,6 @@ public class ShowMembers extends AppCompatActivity {
                     Intent goBackToHomeScreen = new Intent(getApplicationContext(),HomeScreen.class);
                     goBackToHomeScreen.putExtra("HomeObjectID", selectedHomeObjectId);
                     startActivity(goBackToHomeScreen);
-
                 }
                 return false;
             }
@@ -138,15 +139,26 @@ public class ShowMembers extends AppCompatActivity {
     }
     //logout in its own method
     public void logout(){
-        ParseUser.logOutInBackground(new LogOutCallback() {
+        user.put("isLoggedIn",false);
+        user.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if(e == null){
-                    Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
-                    changeActivity(MainActivity.class);
-                }else{
-                    Log.i("ERROR!!!!!!", e.getLocalizedMessage());
-                    Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                    ParseUser.logOutInBackground(new LogOutCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if(e == null){
+                                changeActivity(MainActivity.class);
+                            }else{
+                                user.put("isLoggedIn",true);
+                                user.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                    }
+                                });
+                            }
+                        }
+                    });
                 }
             }
         });

@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -44,8 +46,8 @@ public class AllTasks extends AppCompatActivity {
         recievedIntent = getIntent();
 
         selectedHomeObjectId = recievedIntent.getStringExtra("HomeObjectID");
-        Log.i("loadUsersTasksForThisHome is being called", "!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         populateListView();
+        onItemClickListener();
     }
 
     public void populateListView(){
@@ -54,7 +56,6 @@ public class AllTasks extends AppCompatActivity {
         taskListView = findViewById(R.id.taskListView);
 
         ParseQuery taskQuery = ParseQuery.getQuery("Tasks");
-        Log.i("Home object Id retrieved ", selectedHomeObjectId);
         taskQuery.whereEqualTo("Home", selectedHomeObjectId);
         taskQuery.findInBackground(new FindCallback() {
             @Override
@@ -62,27 +63,52 @@ public class AllTasks extends AppCompatActivity {
 
             }
 
+            //As far as I understand, the Object o must be a list object since I can cast it to an ArrayList..
             @Override
             public void done(Object o, Throwable throwable) {
                 if(throwable == null){
 
                     parseObjects = (ArrayList<ParseObject>) o;
 
-                    for(ParseObject object : parseObjects){
-                        taskList.add(object);
-                        taskNames.add(object.get("Name").toString());
-                        taskObjectIds.add(object.getObjectId());
-
+                    if(parseObjects.size() == 0){
+                        taskNames.add("No task's for this home yet..");
                     }
+                    else{
+                        for(ParseObject object : parseObjects){
+                            taskList.add(object);
+                            taskNames.add(object.get("Name").toString());
+                            taskObjectIds.add(object.getObjectId());
 
+                        }
+                    }
                     taskNamesAdapter.notifyDataSetChanged();
                     taskListView.setAdapter(taskNamesAdapter);
-
                 }
                 else{
-                    Toast.makeText(getApplicationContext(),throwable.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
                 }
 
+            }
+        });
+    }
+    public void onItemClickListener(){
+        taskListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent sendTaskInfo = new Intent(getApplicationContext(), TaskInfo.class);
+
+                ParseObject selectedTask = taskList.get(position);
+
+                sendTaskInfo.putExtra("Name", selectedTask.get("Name").toString());
+                sendTaskInfo.putExtra("details",selectedTask.get("details").toString());
+                sendTaskInfo.putExtra("HomeObjectID", selectedTask.get("Home").toString());
+                sendTaskInfo.putExtra("isAssigned", selectedTask.getBoolean("isAssigned"));
+                if(selectedTask.getBoolean("isAssigned")){
+                    sendTaskInfo.putExtra("assignedTo", selectedTask.get("assignToObjectId").toString());
+                }
+                sendTaskInfo.putExtra("dateTaskCreated", selectedTask.getCreatedAt().toString());
+                sendTaskInfo.putExtra("sender", "AllTasks");
+                //selected user needs a session token to use .getEmail(), which means only logged in user can use .getEmail()
+                startActivity(sendTaskInfo);
             }
         });
     }

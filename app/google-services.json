@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "192922839522",
+    "project_id": "healthyhome-3dd16",
+    "storage_bucket": "healthyhome-3dd16.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:192922839522:android:fc2ec1b732bcd0490e71bb",
+        "android_client_info": {
+          "package_name": "com.cleanspace.healthyhome1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "192922839522-dbrt2jflll2lijf3uhhfo4iebp7jq4oo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBCMHXaFXHJG2klhxg0O4iF8rYXido1TLM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "192922839522-dbrt2jflll2lijf3uhhfo4iebp7jq4oo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

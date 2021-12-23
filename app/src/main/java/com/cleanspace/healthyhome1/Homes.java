@@ -14,7 +14,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingService;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.LogOutCallback;
@@ -24,19 +28,24 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseSession;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.List;
 
 public class Homes extends AppCompatActivity {
     BottomNavigationView bottomNavigationView;
     ParseObject foundHomeObject;
+    ParseUser user;
 
     //Includes setLogoutListener to listen for logout as soon as activity is created
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_homes);
+
         setBottomNavListener();
+        retrieveCurrentFCMRegistrationToken();
+        user = ParseUser.getCurrentUser();
 
     }
 
@@ -58,16 +67,12 @@ public class Homes extends AppCompatActivity {
 //                //if no objects found matching query then method throws exception
 //                if(e == null){
 //                    //Homes containing member was found
-//                    Log.i("TEST","TEST");
-//                    Toast.makeText(getApplicationContext(),"User is only allowed one home temporarily", Toast.LENGTH_SHORT).show();
 //                }
 //                else{
 //                    if(e.getLocalizedMessage().equals("no results found for query")){
 //                        changeActivity(CreateHome.class);
 //                    }
 //                    else{
-//                        Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-//                        Log.i("Exeption thrown", e.getLocalizedMessage());
 //                    }
 //                }
 //            }
@@ -91,24 +96,19 @@ public class Homes extends AppCompatActivity {
             public void done(List<ParseObject> objects, ParseException e) {
                 if(e == null){
 
-                    String foundHome = "";
+                    String foundHomeName = "";
 
                     if(objects.size() > 0){
                         foundHomeObject = objects.get(0);
+                        foundHomeName += objects.get(0).getString("HomeName") + "\n";
                     }
                     else{
-                        Toast.makeText(getApplicationContext(),"No home found by that ID", Toast.LENGTH_SHORT).show();
                     }
 
-
-                        foundHome += objects.get(0).getString("HomeName") + "\n";
-
-                    resultsView.setText(foundHome);
+                    resultsView.setText(foundHomeName);
                     resultsView.setVisibility(View.VISIBLE);
                 }
                 else{
-                    Toast.makeText(getApplicationContext(),e.getLocalizedMessage(),Toast.LENGTH_LONG).show();
-                    Log.i("Error searching home ID", e.getLocalizedMessage());
                 }
             }
         });
@@ -161,18 +161,30 @@ public class Homes extends AppCompatActivity {
     }
     //logout in its own method
     public void logout(){
-        ParseUser.logOutInBackground(new LogOutCallback() {
+        user.put("isLoggedIn",false);
+        user.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if(e == null){
-                    Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
-                    changeActivity(MainActivity.class);
-                }else{
-                    Log.i("ERROR!!!!!!", e.getLocalizedMessage());
-                    Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                    ParseUser.logOutInBackground(new LogOutCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if(e == null){
+                                changeActivity(MainActivity.class);
+                            }else{
+                                user.put("isLoggedIn",true);
+                                user.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                    }
+                                });
+                            }
+                        }
+                    });
                 }
             }
         });
+
     }
     //Helper method to change activites quickly
     public void changeActivity(Class activity){
@@ -183,5 +195,41 @@ public class Homes extends AppCompatActivity {
     //helper method show a user's homes when multi home feature is implemented
     public void showUsersHomes(View view){
         changeActivity(MyHomes.class);
+    }
+
+    //A token produced by FCM to identify the device not the user
+    //used to send a notification from console to a specific device.
+    public void retrieveCurrentFCMRegistrationToken(){
+
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            return;
+                        }
+
+                        // Get new FCM registration token
+                        String token = task.getResult();
+
+                        // Log and toast
+                        String msg = token.toString();
+                        sendTokenToServer(token);
+                    }
+                });
+    }
+    //Sending the token to server each time the Homes activity starts in the onCreate()
+    public void sendTokenToServer(String token){
+        ParseUser user = ParseUser.getCurrentUser();
+        user.put("FCMDeviceToken",token);
+        user.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e == null){
+                }
+                else{
+                }
+            }
+        });
     }
 }

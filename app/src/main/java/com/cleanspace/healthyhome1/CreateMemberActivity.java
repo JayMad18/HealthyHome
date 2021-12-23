@@ -17,6 +17,7 @@ import com.parse.LogOutCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.parse.SignUpCallback;
 
 import java.util.ArrayList;
@@ -46,7 +47,6 @@ public class CreateMemberActivity extends AppCompatActivity {
                EditText username = findViewById(R.id.userNameEditText);
                EditText email = findViewById(R.id.emailEditText);
                EditText password = findViewById(R.id.passwordEditText);
-               EditText conPassword = findViewById(R.id.confirmPasswordEditText);
 
                ParseUser user = new ParseUser();
 
@@ -64,30 +64,33 @@ public class CreateMemberActivity extends AppCompatActivity {
                //ParseUser class method to sign up
                user.signUpInBackground(new SignUpCallback() {
                    public void done(ParseException e) {
-                       if (e == null) {
-                           Log.i("Session Token", user.getSessionToken());
-                           Toast.makeText(getApplicationContext(),"Submitted Succefully", Toast.LENGTH_LONG).show();
+                       if (e == null) {user.put("isLoggedIn", true);
+                           user.saveInBackground(new SaveCallback() {
+                               @Override
+                               public void done(ParseException e) {
+                                   if(e == null){
 
-                           /*
-                           *  -we dont have to send any extra data containing info to identify the current user since
-                           *   now that the user is created and logged in, we can use the ParseUser.getCurrentUser() method to get the current user.
-                           * */
-                           changeActivity(Homes.class);
+                                       /*
+                                        *  -we dont have to send any extra data containing info to identify the current user since
+                                        *   now that the user is created and logged in, we can use the ParseUser.getCurrentUser() method to get the current user.
+                                        * */
+                                       changeActivity(Homes.class);
+                                   }
+                               }
+                           });
+
+
                        } else {
                            // Sign up didn't succeed. Look at the ParseException
                            // to figure out what went wrong
-                           Log.i("Error!!!!!!", e.getLocalizedMessage());
-                           Toast.makeText(getApplicationContext(),"Error: " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                        }
                    }
                });
            }
            else{
-               Toast.makeText(getApplicationContext(),"Passwords do not match!", Toast.LENGTH_LONG).show();
            }
        }
        else{
-           Toast.makeText(getApplicationContext(),"Please fill out all text fields", Toast.LENGTH_LONG).show();
        }
     }
     //Switches to the MainActivty acticity
@@ -102,15 +105,11 @@ public class CreateMemberActivity extends AppCompatActivity {
             @Override
             public void done(ParseException e) {
                 if(e == null){
-                    Log.i("Logged out", "BYE!");
-                    Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_LONG).show();
                     Button logoutButton = findViewById(R.id.logoutButton);
                     logoutButton.setVisibility(View.GONE);
                 } else {
                     // Sign up didn't succeed. Look at the ParseException
                     // to figure out what went wrong
-                    Log.i("Error logging out", e.getLocalizedMessage());
-                    Toast.makeText(getApplicationContext(),"ERROR: error logging out", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -160,12 +159,8 @@ public class CreateMemberActivity extends AppCompatActivity {
                 @Override
                 public void done(ParseException e) {
                     if(e == null){
-                        Log.i("Logged out succesfully", "");
-                        Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
                     }
                     else {
-                        Log.i("ERROR!!!", e.getLocalizedMessage());
-                        Toast.makeText(getApplicationContext(),"Error logging out: "+ e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }
             });

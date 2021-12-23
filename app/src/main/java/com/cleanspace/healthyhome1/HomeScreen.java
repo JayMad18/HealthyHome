@@ -24,6 +24,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import org.json.JSONObject;
 
@@ -42,6 +43,8 @@ public class HomeScreen extends AppCompatActivity {
 
     Intent retrievedHome;
 
+    ParseUser user;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +54,8 @@ public class HomeScreen extends AppCompatActivity {
         generateQuote();
         setBottomNavListener();
         retrieveSelectedHome();
+        user = ParseUser.getCurrentUser();
     }
-
-
-
 
     /*
     * Creates and sends and Intent to start ShowMembers activity
@@ -105,16 +106,12 @@ public class HomeScreen extends AppCompatActivity {
             public void done(Object o, Throwable throwable) {
                 if(throwable == null){
                     if(o == null){
-                        Toast.makeText(getApplicationContext(),"No Home Found", Toast.LENGTH_SHORT).show();
                     }else{
                         selectedHome = (ParseObject) o;
-                        Toast.makeText(getApplicationContext(),selectedHome.get("HomeName").toString(), Toast.LENGTH_SHORT).show();
                     }
 
                 }
                 else{
-                    Toast.makeText(getApplicationContext(),"Error loading Home " + throwable.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                    Log.d("Error loading home", throwable.getLocalizedMessage());
                 }
             }
         });
@@ -153,15 +150,26 @@ public class HomeScreen extends AppCompatActivity {
     }
     //logout in its own method
     public void logout(){
-        ParseUser.logOutInBackground(new LogOutCallback() {
+        user.put("isLoggedIn",false);
+        user.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if(e == null){
-                    Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
-                    changeActivity(MainActivity.class);
-                }else{
-                    Log.i("ERROR!!!!!!", e.getLocalizedMessage());
-                    Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                    ParseUser.logOutInBackground(new LogOutCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if(e == null){
+                                changeActivity(MainActivity.class);
+                            }else{
+                                user.put("isLoggedIn",true);
+                                user.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                    }
+                                });
+                            }
+                        }
+                    });
                 }
             }
         });
@@ -180,12 +188,12 @@ public class HomeScreen extends AppCompatActivity {
         try{
             //link to random quote api
             JSONObject jsonData = randomQuote.execute("https://api.quotable.io/random?maxLength=50").get();
-            Log.i("JSON data tostring", jsonData.toString());
             String content = jsonData.getString("content");
             String author = jsonData.getString("author");
             quoteView.setText(content + "\n"+ "-"+author);
         }catch (Exception e){
             e.printStackTrace();
+            quoteView.setText("Sorry, no quote available..");
         }
     }
 }
@@ -218,8 +226,7 @@ class DownloadRandomQuote extends AsyncTask<String, Void, JSONObject>{
                 e.printStackTrace();
             }
         }catch (Exception e) {
-            //e.printStackTrace();
-            Log.i("Failed at do in background", e.toString());
+            e.printStackTrace();
         }
         return null;
     }

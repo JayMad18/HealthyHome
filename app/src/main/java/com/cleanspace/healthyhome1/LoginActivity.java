@@ -13,6 +13,7 @@ import com.parse.LogInCallback;
 import com.parse.LogOutCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -38,13 +39,18 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void done(ParseUser user, ParseException e) {
                 if(e == null){
-                    changeActivity(Homes.class);
-                    Log.i("SessionToken", ParseUser.getCurrentSessionToken());
-                    Toast.makeText(getApplicationContext(),"Logged In", Toast.LENGTH_SHORT).show();
+                    user.put("isLoggedIn", true);
+                    user.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if(e == null){
+                                changeActivity(Homes.class);
+                            }
+                        }
+                    });
+
                 }
                 else{
-                    Log.i("ERROR!!!!!", e.getLocalizedMessage());
-                    Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -74,12 +80,8 @@ public class LoginActivity extends AppCompatActivity {
                @Override
                public void done(ParseException e) {
                    if(e == null){
-                       Log.i("Logged out succesfully", "");
-                       Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
                    }
                    else {
-                       Log.i("ERROR!!!", e.getLocalizedMessage());
-                       Toast.makeText(getApplicationContext(),"Error logging out: "+ e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                    }
                }
            });

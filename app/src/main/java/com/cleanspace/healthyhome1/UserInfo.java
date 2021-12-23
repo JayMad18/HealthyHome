@@ -18,8 +18,6 @@ public class UserInfo extends AppCompatActivity {
     String selectedHomeObjectId;
     String homeName;
 
-
-
     /*
     * Only onCreate method that displays info on the clicked user as soon as activity created.
     * */
@@ -41,8 +39,6 @@ public class UserInfo extends AppCompatActivity {
         nameTextView.setText("Name: "+userInfo.getStringExtra("name"));
         userNameTextView.setText("Username: "+userInfo.getStringExtra("username"));
         emailTextView.setText("Email: "+userInfo.getStringExtra("email"));
-
-        Log.i("Caught email", emailTextView.getText().toString());
     }
     public void setBottomNavListener(){
         bottomNavigationView = findViewById(R.id.bottom_navigation);

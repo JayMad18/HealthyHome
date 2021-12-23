@@ -24,6 +24,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -35,30 +39,42 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CreateTask extends AppCompatActivity {
     EditText taskNameEditText, detailsEditText;
     TextView taskNameTextView, detailsTextView;
     BottomNavigationView bottomNavigationView;
     Button createTaskButton;
-    ArrayList<ParseUser> membersOfHome = new ArrayList<ParseUser>();
 
     ListView membersListView;
-    String selectedHomeObjectId;
 
-    ParseObject homeObject;
-    ParseObject task;
+
+
+    String selectedHomeObjectId;
+    String TOPIC;
 
     boolean isAssigned, taskHasObjectId;
 
     int position;
 
+
+    ParseObject homeObject;
+    ParseObject task;
+    ParseUser user;
+    ParseObject assignedMember;
+
+    ArrayList<String> registrationTokens = new ArrayList<String>();
     ArrayList<ParseUser> memberObjects = new ArrayList<ParseUser>();
     ArrayList<String> memberNames = new ArrayList<String>();
     ArrayList<String> memberObjectIds = new ArrayList<String>();
-    ArrayList<String> taskList = new ArrayList<String>();
+
 
     /**
      * TODO fix issue when user wants to immediatly create another task after another
@@ -83,11 +99,14 @@ public class CreateTask extends AppCompatActivity {
 
         membersListView = findViewById(R.id.membersListView);
 
+        user = ParseUser.getCurrentUser();
+
 
 
 
         Intent homeObjectId = getIntent();
         selectedHomeObjectId = homeObjectId.getStringExtra("HomeObjectID");
+        TOPIC = "/topics/"+selectedHomeObjectId + "TOPIC";
 
         //getting homeObject just incase
         ParseQuery<ParseObject> homeQuery = ParseQuery.getQuery("Homes");
@@ -95,13 +114,10 @@ public class CreateTask extends AppCompatActivity {
             @Override
             public void done(ParseObject object, ParseException e) {
                 if(e == null){
-                    Log.i("query current home", "Home Found!");
                     homeObject = object;
                     task = new ParseObject("Tasks");
                 }
                 else {
-                    Log.i("query current home", e.getLocalizedMessage());
-                    Toast.makeText(getApplicationContext(),e.getLocalizedMessage(),Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -139,19 +155,18 @@ public class CreateTask extends AppCompatActivity {
             public void done(ParseException e) {
                 if(e == null){
                     if(isAssigned){
-                        Toast.makeText(CreateTask.this, "Task created and assigned to " + memberObjects.get(position).get("name"), Toast.LENGTH_SHORT).show();
                         taskHasObjectId = true;
+                        buildJSONMessageObject(isAssigned);
                         changeActivity(HomeScreen.class);
+
                     }
                     else{
-                        Toast.makeText(CreateTask.this, "Task created succesfully", Toast.LENGTH_SHORT).show();
+                        buildJSONMessageObject(isAssigned);
                         changeActivity(HomeScreen.class);
+
                     }
                 }
                 else{
-
-                    Log.i("error message", e.getLocalizedMessage());
-                    Toast.makeText(CreateTask.this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -174,8 +189,6 @@ public class CreateTask extends AppCompatActivity {
                     memberNamesAdapter.notifyDataSetChanged();
                     membersListView.setAdapter(memberNamesAdapter);
                 }else{
-                    Toast.makeText(getApplicationContext(),"Error loading members "+e.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
-                    Log.d("error loading homes",e.getLocalizedMessage());
                 }
             }
         });
@@ -185,7 +198,6 @@ public class CreateTask extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(taskNameEditText.getText().length() == 0){
-                    Toast.makeText(CreateTask.this, "You have not created a name for your task yet.", Toast.LENGTH_LONG).show();
                 }
                 else{
                     confirmAssignTaskToMember(position);
@@ -200,7 +212,7 @@ public class CreateTask extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                                 isAssigned = true;
-                                Toast.makeText(getApplicationContext(),memberObjects.get(position).get("name") + " has been assigned!",Toast.LENGTH_SHORT).show();
+                                assignedMember = memberObjects.get(position);
                     }
                 }).setNegativeButton("Don't assign", null).show();
     }
@@ -211,10 +223,7 @@ public class CreateTask extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                if(item.getItemId() == R.id.logoutItem){
-                    logoutAlertDialog();
-                }
-                else if(item.getItemId() == R.id.backItem){
+                if(item.getItemId() == R.id.backItem){
                     changeActivity(HomeScreen.class);
                 }
                 return false;
@@ -225,35 +234,134 @@ public class CreateTask extends AppCompatActivity {
      * A logout alert dialog that ask's if sure want to log out,
      * this needs to be implemented in all activites that allow user to log out
      * */
-    public void logoutAlertDialog(){
-        new AlertDialog.Builder(this).setTitle("Log out").setMessage("Are you sure you want to log out?")
-                .setIcon(android.R.drawable.ic_media_previous).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                logout();
-            }
-        }).setNegativeButton("No", null).show();
-    }
-    //logout in its own method
-    public void logout(){
-        ParseUser.logOutInBackground(new LogOutCallback() {
-            @Override
-            public void done(ParseException e) {
-                if(e == null){
-                    Toast.makeText(getApplicationContext(),"Logged Out", Toast.LENGTH_SHORT).show();
-                    changeActivity(MainActivity.class);
-                }else{
-                    Log.i("ERROR!!!!!!", e.getLocalizedMessage());
-                    Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
+//    public void logoutAlertDialog(){
+//        new AlertDialog.Builder(this).setTitle("Log out").setMessage("Are you sure you want to log out?")
+//                .setIcon(android.R.drawable.ic_media_previous).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                logout();
+//            }
+//        }).setNegativeButton("No", null).show();
+//    }
+//    //logout in its own method
+//    public void logout(){
+//        user.put("isLoggedIn",false);
+//        user.saveInBackground(new SaveCallback() {
+//            @Override
+//            public void done(ParseException e) {
+//                if(e == null){
+//                    ParseUser.logOutInBackground(new LogOutCallback() {
+//                        @Override
+//                        public void done(ParseException e) {
+//                            if(e == null){
+//                                changeActivity(MainActivity.class);
+//                            }else{
+//                                user.put("isLoggedIn",true);
+//                                user.saveInBackground(new SaveCallback() {
+//                                    @Override
+//                                    public void done(ParseException e) {
+//                                    }
+//                                });
+//                            }
+//                        }
+//                    });
+//                }
+//            }
+//        });
+//    }
     //helper method to quickly switch activites
     public void changeActivity(Class activity){
         Intent switchActivity = new Intent(getApplicationContext(), activity);
         switchActivity.putExtra("HomeObjectID", selectedHomeObjectId);
         startActivity(switchActivity);
+    }
+
+//    public void loadRegistrationTokens(){
+//        /*
+//         * Queries all users that are logged in and the loops through each user to see of there homeList contains this home.
+//         * */
+//        ParseQuery<ParseUser> inThisHomeQuery = ParseUser.getQuery();
+//        inThisHomeQuery.whereEqualTo("isLoggedIn", true);
+//        inThisHomeQuery.findInBackground(new FindCallback<ParseUser>() {
+//            @Override
+//            public void done(List<ParseUser> objects, ParseException e) {
+//                if(e == null){
+//                    if(objects.size() > 0){
+//                        for(ParseUser member : objects){
+//                            ArrayList<String> homeList = (ArrayList<String>) member.get("HomeList");
+//                            if(homeList.contains(selectedHomeObjectId)){
+//                                registrationTokens.add((String) member.get("FCMDeviceToken"));
+//                            }
+//                        }
+//                        buildJSONMessageObject(isAssigned);
+//                    }
+//                }
+//            }
+//        });
+//    }
+
+    /*
+     *create a JsonObject of the notification body
+     * This object will contain the receiver’s topic, notification title,
+     * notification message, and other key/value pairs to add.
+     * */
+    public void buildJSONMessageObject(boolean isAssigned){
+        JSONObject notification = new JSONObject();
+        JSONObject notificationBody = new JSONObject();
+        if(isAssigned == true){
+            try {
+                notificationBody.put("title", "New Task");
+                notificationBody.put("message", ParseUser.getCurrentUser().getUsername()+" has assigned " +
+                        assignedMember.get("name") + " to " + task.get("Name"));
+
+                notification.put("to", TOPIC);
+                //notification.put("registration_ids",registrationTokens);
+                notification.put("data", notificationBody);
+            } catch ( JSONException e) {
+            }
+        }
+        else{
+            try {
+                notificationBody.put("title", "New Task");
+                notificationBody.put("message", ParseUser.getCurrentUser().getUsername()+" has created a new task: " + task.get("Name"));
+
+                notification.put("to", TOPIC);
+                //notification.put("registration_ids",registrationTokens);
+                notification.put("data", notificationBody);
+            } catch ( JSONException e) {
+            }
+        }
+
+
+
+        sendNotification(notification);
+    }
+
+    /*
+     *make a network request to FCM server using Volley library,
+     *then the server will use the request parameters to route the
+     *notification to the targeted device.
+     * */
+    public void sendNotification(JSONObject notification){
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(getString(R.string.FCM_API), notification,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+            }
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("Authorization","key="+getString(R.string.server_key));
+                params.put("Content-Type", getString(R.string.content_type));
+                return params;
+            }
+        };
+        MySingleton.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
     }
 
 
@@ -273,18 +381,13 @@ public class CreateTask extends AppCompatActivity {
      */
     boolean isKeyboardShowing = false;
     void onKeyboardVisibilityChanged(boolean opened) {
-        if(opened == false){
-            Log.i("keyboard " , "False");
-            // Toast.makeText(getApplicationContext(),"False",Toast.LENGTH_LONG).show();
-        }
-        else{
-            Log.i("keyboard " , "True");
-            // Toast.makeText(getApplicationContext(),"True",Toast.LENGTH_LONG).show();
-        }
+//        if(opened == false){
+//        }
+//        else{
+//        }
 
     }
     public void keyboardDetector(){
-        Log.d("JAY!!!!!!", "This is right before .getViewObserver is called");
         createTaskButton.getViewTreeObserver().addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
@@ -297,8 +400,6 @@ public class CreateTask extends AppCompatActivity {
                         // r.bottom is the position above soft keypad or device button.
                         // if keypad is shown, the r.bottom is smaller than that before.
                         int keypadHeight = screenHeight - r.bottom;
-
-                        Log.d("JAY!!!!!!", "keypadHeight = " + keypadHeight);
 
                         if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is perhaps enough to determine keypad height.
                             // keyboard is opened
