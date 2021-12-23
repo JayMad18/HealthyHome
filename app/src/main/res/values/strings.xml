@@ -9,6 +9,20 @@
     <string name="bottom_left_button">Add Task</string>
     <string name="bottom_right_button">Members</string>
 
+    <string name="user_task_assignment">Task Assignment</string>
+
+    <string name="user_joined_home_channel_id">20323</string>
+    <string name="user_joined_home_channel_name">User joined your home</string>
+    <string name="user_joined_home_channel_description">A user has joined your home</string>
+
+    <string name="general_channel_id">20323</string>
+    <string name="general_channel_name">General</string>
+    <string name="general_channel_description">A general all purpose notification channel</string>
+
+    <string name="FCM_API">https://fcm.googleapis.com/fcm/send</string>
+    <string name="server_key">AAAALOsY6eI:APA91bG8CljSIJHIWT8puOLsOk4fXCAjuZUHXRnN2EruJCTKpMxzsVshBX5bxyJxxuO-taj8HJJOPr7srVUwmbnZmEvo_aK8-C-q5h0zuQ_pY4-ZXo8dcXWrS48m_YnoPAfIPzdOFmpR</string>
+    <string name="content_type">application/json</string>
+
 
     <integer name="layout_margin_top">20</integer>
 

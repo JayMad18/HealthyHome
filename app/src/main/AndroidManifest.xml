@@ -13,7 +13,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HealthyHome1">
-        <activity android:name=".AllTasks"></activity>
+        <activity android:name=".TaskInfo"></activity>
+
+        <service
+            android:name=".MyFirebaseMessagingService"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <activity android:name=".AllTasks" />
         <activity android:name=".MyTasks" />
         <activity android:name=".CreateTask" />
         <activity android:name=".UserInfo" />
@@ -42,6 +53,9 @@
         <meta-data
             android:name="com.parse.CLIENT_KEY"
             android:value="@string/back4app_client_key" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/general_channel_id" />
     </application>
 
 </manifest>

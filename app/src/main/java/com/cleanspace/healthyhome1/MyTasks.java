@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -47,6 +49,7 @@ public class MyTasks extends AppCompatActivity {
         selectedHomeObjectId = recievedIntent.getStringExtra("HomeObjectID");
         Log.i("loadUsersTasksForThisHome is being called", "!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         loadTasks();
+
     }
 
     public void loadTasks(){
@@ -93,13 +96,17 @@ public class MyTasks extends AppCompatActivity {
      */
     public void populateListView(){
         taskListView = findViewById(R.id.taskListView);
-        if(taskNames.size() == 0){
-            taskNames.add("Looks like you have nothing to do!");
-        }
         ArrayAdapter<String> taskNamesAdapter = new ArrayAdapter<String>(this, R.layout.list_layout, R.id.list_content,taskNames);
         taskNamesAdapter.notifyDataSetChanged();
         taskListView.setAdapter(taskNamesAdapter);
-        updateUsersTaskList();
+        if(taskNames.size() == 0){
+            taskNames.add("Looks like you have nothing to do!");
+        }
+        else {
+            updateUsersTaskList();
+        }
+
+
 
 
     }
@@ -111,11 +118,34 @@ public class MyTasks extends AppCompatActivity {
             @Override
             public void done(ParseException e) {
                 if(e == null){
-                    Toast.makeText(getApplicationContext(),"task list updated", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(),"task list updated", Toast.LENGTH_SHORT).show();
+                    onItemClickListener();
                 }
                 else{
                     Toast.makeText(getApplicationContext(),e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+    }
+    public void onItemClickListener(){
+        taskListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent sendTaskInfo = new Intent(getApplicationContext(), TaskInfo.class);
+
+                ParseObject selectedTask = taskList.get(position);
+
+                sendTaskInfo.putExtra("Name", selectedTask.get("Name").toString());
+                sendTaskInfo.putExtra("details",selectedTask.get("details").toString());
+                sendTaskInfo.putExtra("HomeObjectID", selectedTask.get("Home").toString());
+                sendTaskInfo.putExtra("isAssigned", selectedTask.getBoolean("isAssigned"));
+                if(selectedTask.getBoolean("isAssigned")){
+                    sendTaskInfo.putExtra("assignedTo", selectedTask.get("assignToObjectId").toString());
+                }
+                sendTaskInfo.putExtra("dateTaskCreated", selectedTask.getCreatedAt().toString());
+                sendTaskInfo.putExtra("sender", "MyTasks");
+                //selected user needs a session token to use .getEmail(), which means only logged in user can use .getEmail()
+                startActivity(sendTaskInfo);
             }
         });
     }
