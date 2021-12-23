@@ -221,7 +221,6 @@ public class ViewHome extends AppCompatActivity {
                         if (!task.isSuccessful()) {
                             msg = "Subscribe to home failed";
                         }
-                        Log.d("Topic subscription", msg);
                         Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
                         TOPIC = "/topics/"+foundHomeObject.getObjectId() + "TOPIC";
                         buildJSONMessageObject();
@@ -271,7 +270,6 @@ public class ViewHome extends AppCompatActivity {
             //notification.put("registration_ids",registrationTokens);
             notification.put("data", notificationBody);
         } catch ( JSONException e) {
-            Log.e("From buildJSONMessageObject() in ViewHome class", "onCreate: " + e.getMessage() );
         }
 
         sendNotification(notification);
@@ -287,13 +285,11 @@ public class ViewHome extends AppCompatActivity {
                 new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                Log.i("From sendNotification() in ViewHome", "onResponse: " + response.toString());
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(getApplicationContext(), "Request error", Toast.LENGTH_LONG).show();
-                Log.i("From sendNotification() in ViewHome", "onErrorResponse: Didn't work");
             }
         }){
             @Override
@@ -301,7 +297,6 @@ public class ViewHome extends AppCompatActivity {
                 Map<String, String> params = new HashMap<>();
                 params.put("Authorization","key="+getString(R.string.server_key));
                 params.put("Content-Type", getString(R.string.content_type));
-                Log.i("From getHeaders() in ViewHome", params.toString());
                 return params;
             }
         };

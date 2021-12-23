@@ -200,7 +200,6 @@ public class CreateHome extends AppCompatActivity {
                         if (!task.isSuccessful()) {
                             msg = "Subscribe to home failed";
                         }
-                        Log.d("Topic subscription", msg);
                         Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
 //                        TOPIC = "/topics/"+homeObjectId + "TOPIC";
 //                        loadRegistrationTokens();

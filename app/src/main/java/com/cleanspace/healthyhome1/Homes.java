@@ -215,7 +215,6 @@ public class Homes extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<String> task) {
                         if (!task.isSuccessful()) {
-                            Log.w("TOKEN ", "Fetching FCM registration token failed", task.getException());
                             return;
                         }
 
@@ -224,7 +223,6 @@ public class Homes extends AppCompatActivity {
 
                         // Log and toast
                         String msg = token.toString();
-                        Log.d("TOKEN ", msg);
                         //Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
                         sendTokenToServer(token);
                     }
@@ -238,11 +236,9 @@ public class Homes extends AppCompatActivity {
             @Override
             public void done(ParseException e) {
                 if(e == null){
-                    Log.i("Token","New token generated and sent to parse server");
                     //Toast.makeText(getApplicationContext(),"New FCM device token generated",Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    Log.i("Token",e.getLocalizedMessage());
                     Toast.makeText(getApplicationContext(),e.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
                 }
             }

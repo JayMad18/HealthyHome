@@ -329,7 +329,7 @@ public class CreateTask extends AppCompatActivity {
                 //notification.put("registration_ids",registrationTokens);
                 notification.put("data", notificationBody);
             } catch ( JSONException e) {
-                Log.e("From buildJSONMessageObject() in ViewHome class", "onCreate: " + e.getMessage() );
+                Toast.makeText(getApplicationContext(),"error building notification...",Toast.LENGTH_SHORT);
             }
         }
         else{
@@ -341,7 +341,7 @@ public class CreateTask extends AppCompatActivity {
                 //notification.put("registration_ids",registrationTokens);
                 notification.put("data", notificationBody);
             } catch ( JSONException e) {
-                Log.e("From buildJSONMessageObject() in ViewHome class", "onCreate: " + e.getMessage() );
+                Toast.makeText(getApplicationContext(),"error building notification...",Toast.LENGTH_SHORT);
             }
         }
 
@@ -360,13 +360,11 @@ public class CreateTask extends AppCompatActivity {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.i("From sendNotification() in ViewHome", "onResponse: " + response.toString());
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(), "Request error", Toast.LENGTH_LONG).show();
-                Log.i("From sendNotification() in ViewHome", "onErrorResponse: Didn't work");
+                Toast.makeText(getApplicationContext(), " error..", Toast.LENGTH_LONG).show();
             }
         }){
             @Override
@@ -374,7 +372,6 @@ public class CreateTask extends AppCompatActivity {
                 Map<String, String> params = new HashMap<>();
                 params.put("Authorization","key="+getString(R.string.server_key));
                 params.put("Content-Type", getString(R.string.content_type));
-                Log.i("From getHeaders() in ViewHome", params.toString());
                 return params;
             }
         };
