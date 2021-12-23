@@ -77,7 +77,7 @@ public class TaskInfo extends AppCompatActivity {
         detailsTextView.setText("details: "+sentTaskInfo.getStringExtra("details"));
         dateCreatedTextView.setText("date created: "+sentTaskInfo.getStringExtra("dateTaskCreated"));
     }
-
+//
     public void setBottomNavListener(){
         String sender = sentTaskInfo.getStringExtra("sender");
         bottomNavigationView = findViewById(R.id.bottom_navigation);
