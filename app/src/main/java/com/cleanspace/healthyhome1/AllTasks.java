@@ -76,7 +76,18 @@ public class AllTasks extends AppCompatActivity {
                     else{
                         for(ParseObject object : parseObjects){
                             taskList.add(object);
-                            taskNames.add(object.get("Name").toString());
+                            if(object.get("isCompleted") != null){
+                                if(object.get("isCompleted").equals(true)){
+                                    taskNames.add(object.get("Name").toString() +"    :)");
+                                }
+                                else{
+                                    taskNames.add(object.get("Name").toString() +"..");
+                                }
+                            }
+                            else{
+                                taskNames.add(object.get("Name").toString() +"..");
+                            }
+
                             taskObjectIds.add(object.getObjectId());
 
                         }
@@ -107,6 +118,20 @@ public class AllTasks extends AppCompatActivity {
                 }
                 sendTaskInfo.putExtra("dateTaskCreated", selectedTask.getCreatedAt().toString());
                 sendTaskInfo.putExtra("sender", "AllTasks");
+                sendTaskInfo.putExtra("taskObjectId", selectedTask.getObjectId());
+                if(selectedTask.get("isCompleted") != null){
+                    if(selectedTask.get("isCompleted").equals(true)){
+                        sendTaskInfo.putExtra("isCompleted", selectedTask.get("isCompleted").toString());
+                        sendTaskInfo.putExtra("completedBy", selectedTask.get("completedBy").toString());
+                    }
+                    else {
+                        sendTaskInfo.putExtra("isCompleted", "false");
+                        sendTaskInfo.putExtra("completedBy", " No One");
+                    }
+                }else{
+                    sendTaskInfo.putExtra("isCompleted", "false");
+                    sendTaskInfo.putExtra("completedBy", " No One");
+                }
                 //selected user needs a session token to use .getEmail(), which means only logged in user can use .getEmail()
                 startActivity(sendTaskInfo);
             }

@@ -149,6 +149,9 @@ public class CreateTask extends AppCompatActivity {
             task.put("isAssigned", true);
             task.put("assignToObjectId", assignedMemberObjectId);
         }
+        else{
+            task.put("isAssigned", false);
+        }
 
         task.saveInBackground(new SaveCallback() {
             @Override
