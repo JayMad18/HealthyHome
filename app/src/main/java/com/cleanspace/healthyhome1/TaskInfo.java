@@ -3,6 +3,8 @@ package com.cleanspace.healthyhome1;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -163,7 +166,25 @@ public class TaskInfo extends AppCompatActivity {
         });
     }
     public void completeTask(View button){
-        //TODO: add alert dialog before marking complete
+        new AlertDialog.Builder(this).setTitle("Complete Task").setMessage("Are you sure that this task is complete?")
+                .setPositiveButton("Yea", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                       complete();
+                    }
+                }).setNegativeButton("Not yet..", null).show();
+    }
+
+    public void deleteTask(View button){
+        new AlertDialog.Builder(this).setTitle("Delete Task").setMessage("Are you sure you want to delete this task? ")
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        delete();
+                    }
+                }).setNegativeButton("Cancel", null).show();
+    }
+    public void complete(){
         if(isAssigned){
             if(ParseUser.getCurrentUser().getObjectId().equals(assignedToObject.getObjectId())){
                 task.put("isCompleted",true);
@@ -200,6 +221,7 @@ public class TaskInfo extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(),"Task marked complete!", Toast.LENGTH_SHORT).show();
                         statusTextView.setText("Completed");
                         completedByTextView.setText("Completed by "+ParseUser.getCurrentUser().get("name").toString());
+                        statusTextView.setTextColor(getColor(R.color.DeepPink));
                         //TODO: send notification to all members of home that task has been completed
                     }
                     else{
@@ -209,12 +231,21 @@ public class TaskInfo extends AppCompatActivity {
                 }
             });
         }
-
-
-
     }
-    public void deleteTask(View button){
+    public void delete(){
+        task.deleteInBackground(new DeleteCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e == null){
+                    Toast.makeText(getApplicationContext(),"Task deleted succesfully", Toast.LENGTH_SHORT).show();
+                    changeActivity(HomeScreen.class);
+                }
+                else {
+                    Toast.makeText(getApplicationContext(),"Error deleting task: "+ e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
 
+                }
+            }
+        });
     }
     //helper method to quickly switch activites
     public void changeActivity(Class activity){
