@@ -67,8 +67,8 @@
         android:layout_marginTop="20dp"
         android:background="@drawable/rounded_edit_text"
         android:ems="10"
-        android:hint="Any extra info about this tasks?"
         android:gravity="center"
+        android:hint="Any extra info about this tasks?"
         android:inputType="textMultiLine"
         android:textColor="@color/GhostWhite"
         android:textSize="20sp"
@@ -82,15 +82,16 @@
         android:layout_height="wrap_content"
         android:onClick="createTask"
         android:text="Create"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/membersListView" />
 
     <ListView
         android:id="@+id/membersListView"
         android:layout_width="match_parent"
         android:layout_height="261dp"
+        android:divider="@null"
+        android:dividerHeight="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/detailsEditText" />
