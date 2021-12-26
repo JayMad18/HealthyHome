@@ -236,7 +236,7 @@ public class TaskInfo extends AppCompatActivity {
                     public void done(ParseException e) {
                         if(e == null){
                             statusTextView.setText("Completed");
-                            statusTextView.setTextColor(getColor(R.color.DeepPink));
+                            statusTextView.setTextColor(getColor(R.color.HotPink));
                             completedByTextView.setText("Completed by "+assignedToObject.get("name").toString());
                             buildJSONMessageObject();                        }
                         else{
@@ -261,7 +261,7 @@ public class TaskInfo extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(),"Task marked complete!", Toast.LENGTH_SHORT).show();
                         statusTextView.setText("Completed");
                         completedByTextView.setText("Completed by "+ParseUser.getCurrentUser().get("name").toString());
-                        statusTextView.setTextColor(getColor(R.color.DeepPink));
+                        statusTextView.setTextColor(getColor(R.color.HotPink));
                         buildJSONMessageObject();
                     }
                     else{
