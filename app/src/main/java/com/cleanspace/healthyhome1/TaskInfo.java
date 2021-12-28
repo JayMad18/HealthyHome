@@ -152,7 +152,6 @@ public class TaskInfo extends AppCompatActivity {
                     retrieveTaskStatus();
                 }
                 else{
-                    Log.d("retrieveTaskObject()",e.getLocalizedMessage());
                 }
             }
         });
@@ -258,7 +257,6 @@ public class TaskInfo extends AppCompatActivity {
                 @Override
                 public void done(ParseException e) {
                     if(e == null){
-                        Toast.makeText(getApplicationContext(),"Task marked complete!", Toast.LENGTH_SHORT).show();
                         statusTextView.setText("Completed");
                         completedByTextView.setText("Completed by "+ParseUser.getCurrentUser().get("name").toString());
                         statusTextView.setTextColor(getColor(R.color.HotPink));
