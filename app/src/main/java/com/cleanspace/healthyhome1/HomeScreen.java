@@ -37,7 +37,7 @@ import java.util.Scanner;
 import javax.net.ssl.HttpsURLConnection;
 
 public class HomeScreen extends AppCompatActivity {
-    TextView quoteView;
+    TextView quoteView, homeNameAndIdTextView;
     BottomNavigationView bottomNavigationView;
     ParseObject selectedHome;
 
@@ -55,6 +55,7 @@ public class HomeScreen extends AppCompatActivity {
         setBottomNavListener();
         retrieveSelectedHome();
         user = ParseUser.getCurrentUser();
+        homeNameAndIdTextView = findViewById(R.id.homeNameAndIdTextView);
     }
 
     /*
@@ -108,6 +109,7 @@ public class HomeScreen extends AppCompatActivity {
                     if(o == null){
                     }else{
                         selectedHome = (ParseObject) o;
+                        homeNameAndIdTextView.setText(selectedHome.get("HomeName").toString()+": " + selectedHome.get("ID"));
                     }
 
                 }

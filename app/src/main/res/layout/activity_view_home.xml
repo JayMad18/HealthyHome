@@ -64,6 +64,8 @@
             android:id="@+id/membersListView"
             android:layout_width="match_parent"
             android:layout_height="420dp"
+            android:divider="@null"
+            android:dividerHeight="0dp"
             android:textAlignment="center"
             android:theme="@style/Widget.MaterialComponents.TextView" />
     </LinearLayout>
