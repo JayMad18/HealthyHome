@@ -8,8 +8,10 @@
 
     <ListView
         android:id="@+id/myHomesListView"
-        android:layout_width="309dp"
-        android:layout_height="318dp"
+        android:layout_width="406dp"
+        android:layout_height="581dp"
+        android:divider="@null"
+        android:dividerHeight="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

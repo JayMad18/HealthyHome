@@ -58,6 +58,7 @@ public class CreateTask extends AppCompatActivity {
 
 
     String selectedHomeObjectId;
+    String assignerObjectId;
     String TOPIC;
 
     boolean isAssigned, taskHasObjectId;
@@ -69,6 +70,7 @@ public class CreateTask extends AppCompatActivity {
     ParseObject task;
     ParseUser user;
     ParseObject assignedMember;
+
 
     ArrayList<String> registrationTokens = new ArrayList<String>();
     ArrayList<ParseUser> memberObjects = new ArrayList<ParseUser>();
@@ -127,8 +129,6 @@ public class CreateTask extends AppCompatActivity {
         assignToMemberItemClickListener();
 
     }
-
-
     /*
     * Creates and saves task to the server.
     *
@@ -148,6 +148,10 @@ public class CreateTask extends AppCompatActivity {
         if(isAssigned){
             task.put("isAssigned", true);
             task.put("assignToObjectId", assignedMemberObjectId);
+            task.put("assignerObjectId",assignerObjectId);
+        }
+        else{
+            task.put("isAssigned", false);
         }
 
         task.saveInBackground(new SaveCallback() {
@@ -213,6 +217,8 @@ public class CreateTask extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                                 isAssigned = true;
                                 assignedMember = memberObjects.get(position);
+                                assignerObjectId = ParseUser.getCurrentUser().getObjectId().toString();
+
                     }
                 }).setNegativeButton("Don't assign", null).show();
     }
@@ -331,9 +337,6 @@ public class CreateTask extends AppCompatActivity {
             } catch ( JSONException e) {
             }
         }
-
-
-
         sendNotification(notification);
     }
 
