@@ -73,6 +73,7 @@ public class ViewHome extends AppCompatActivity {
     BottomNavigationView bottomNavigationView;
 
     String TOPIC;
+    String PERSONALTOPIC;
 
     /*
     * onCreate() method recieves intent and data sent with intent after creating activity
@@ -214,10 +215,31 @@ public class ViewHome extends AppCompatActivity {
                         String msg = "subscribe to home success";
                         if (!task.isSuccessful()) {
                             msg = "Subscribe to home failed";
+                            Toast.makeText(getApplicationContext(),"Error occurred...may not receive notifications",Toast.LENGTH_LONG).show();
                         }
-                        TOPIC = "/topics/"+foundHomeObject.getObjectId() + "TOPIC";
-                        buildJSONMessageObject();
-                        //loadRegistrationTokens();
+                        else{
+                            TOPIC = "/topics/"+foundHomeObject.getObjectId() + "TOPIC";
+                            subscribeToPersonalTopic();
+
+                        }
+
+                    }
+                });
+    }
+    public void subscribeToPersonalTopic(){
+        FirebaseMessaging.getInstance().subscribeToTopic("/topics/"+ParseUser.getCurrentUser().getObjectId() + "TOPIC")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        PERSONALTOPIC = "/topics/"+ParseUser.getCurrentUser().getObjectId() + "TOPIC";
+                        ParseUser.getCurrentUser().put("HOMETOPIC", TOPIC);
+                        ParseUser.getCurrentUser().put("PERSONALTOPIC", PERSONALTOPIC);
+                        ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                buildJSONMessageObject();
+                            }
+                        });
                     }
                 });
     }

@@ -6,7 +6,7 @@
         <item name="colorPrimaryVariant">@color/GhostWhite</item>
         <item name="colorOnPrimary">@color/Pink</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/Pink</item>
+        <item name="colorSecondary">@color/GhostWhite</item>
         <item name="colorSecondaryVariant">@color/Pink</item>
         <item name="colorOnSecondary">@color/GhostWhite</item>
         <!-- Status bar color. -->

@@ -99,8 +99,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+
         app:layout_constraintStart_toStartOf="parent">
-        ...
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottom_navigation"
@@ -110,5 +110,31 @@
             app:menu="@menu/my_homes_bottom_nav" />
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/timePickerView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="set time"
+        android:textSize="20sp"
+        android:textColor="@color/Pink"
+        android:onClick="showTimePickerDialog"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+        app:layout_constraintEnd_toStartOf="@+id/createTaskButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/createTaskButton" />
+
+    <TextView
+        android:id="@+id/calendarPickerView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="set date"
+        android:textSize="20sp"
+        android:textColor="@color/Pink"
+        android:onClick="showDatePickerDialog"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/createTaskButton"
+        app:layout_constraintTop_toTopOf="@+id/createTaskButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
