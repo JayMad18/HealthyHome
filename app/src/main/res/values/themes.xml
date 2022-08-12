@@ -6,12 +6,13 @@
         <item name="colorPrimaryVariant">@color/Pink</item>
         <item name="colorOnPrimary">@color/GhostWhite</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/GhostWhite</item>
+        <item name="colorSecondary">@color/Pink</item>
         <item name="colorSecondaryVariant">@color/GhostWhite</item>
         <item name="colorOnSecondary">@color/Pink</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorSecondary</item>
         <!-- Customize your theme here. -->
+        <item name="android:windowSplashscreenContent">@drawable/ic_home_black_24dp</item>
     </style>
 
     <style name="Theme.HealthyHome1.NoActionBar">
