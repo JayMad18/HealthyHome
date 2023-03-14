@@ -27,7 +27,7 @@ import java.util.Map;
 
 import static android.content.Context.ALARM_SERVICE;
 import static com.parse.Parse.getApplicationContext;
-
+/*💯 ❤️😍😂💕👌💯💯💯*/
 
 public class HealthyHomeBroadcastReceiverOne extends BroadcastReceiver {
 
@@ -71,7 +71,7 @@ public class HealthyHomeBroadcastReceiverOne extends BroadcastReceiver {
     Intent intent;
 
     //Send final variables by intent.
-    //this below will be visible on github VERY BAD
+    /*TODO//this below will be visible on github VERY BAD */
     private final String FCM_API = "";
     private final String server_key = "";
     private final String content_type = "";
