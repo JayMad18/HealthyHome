@@ -50,12 +50,26 @@ public class HomeScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
-        retrievedHome = getIntent();
+        if(getIntent() == null){//making sure intent isnt null
+            Log.d("getIntent: ", "---------------Null!!!-------------------");
+            Toast.makeText(getApplicationContext(),"No intent recieved!",Toast.LENGTH_LONG).show();
+        }else{
+            retrievedHome = getIntent();
+        }
+
+        user = ParseUser.getCurrentUser();
+        homeNameAndIdTextView = findViewById(R.id.homeNameAndIdTextView);
         generateQuote();
         setBottomNavListener();
         retrieveSelectedHome();
-        user = ParseUser.getCurrentUser();
-        homeNameAndIdTextView = findViewById(R.id.homeNameAndIdTextView);
+
+    }
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        // Make sure to call the super method so that the states of our views are saved
+        super.onSaveInstanceState(outState);
+        // Save our own state now
+
     }
 
     /*
@@ -109,6 +123,7 @@ public class HomeScreen extends AppCompatActivity {
                     if(o == null){
                     }else{
                         selectedHome = (ParseObject) o;
+                        String text = selectedHome.get("HomeName").toString()+": " + selectedHome.get("ID");
                         homeNameAndIdTextView.setText(selectedHome.get("HomeName").toString()+": " + selectedHome.get("ID"));
                     }
 

@@ -72,9 +72,9 @@ public class HealthyHomeBroadcastReceiverOne extends BroadcastReceiver {
 
     //Send final variables by intent.
     /*TODO//this below will be visible on github VERY BAD */
-    private final String FCM_API = "";
-    private final String server_key = "";
-    private final String content_type = "";
+    private final String FCM_API = "@string/FCM_API";
+    private final String server_key = "@string/server_key";
+    private final String content_type = "@string/content_type";
 
     String taskName, taskDetails, assignedToObjectId, TOPIC, PERSONALTOPIC;
     @Override
