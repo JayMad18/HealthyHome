@@ -121,6 +121,7 @@ public class MyTasks extends AppCompatActivity {
 
     //The users tasklist on the parse backend is updated during this activity.
     public void updateUsersTaskList(){
+
         ParseUser.getCurrentUser().put("taskList", taskObjectIds);
         ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
             @Override

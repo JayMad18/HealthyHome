@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -83,7 +84,8 @@ public class CreateHome extends AppCompatActivity {
     //SOLUTION!!It was because the User data was saving in the background before the Home data got saved, so
     //all I had to do was put User save process inside done() method of saveinbackground for home.
     public void saveHomeToArrayList(ParseUser user, ParseObject home){
-        ArrayList<String> homesList = (ArrayList) user.getList("HomeList");
+        ArrayList<String> homesList =  new ArrayList<String>();
+        homesList.addAll(Objects.requireNonNull(user.getList("HomeList")));
         homesList.add(home.getObjectId());
         user.put("HomeList",homesList);
 
@@ -93,12 +95,12 @@ public class CreateHome extends AppCompatActivity {
             @Override
             public void done(ParseException e) {
                 if(e != null){
+                    Log.d("CreateTask.java -> saveHomeToArrayList", e.getLocalizedMessage()+"----------------");
                 }
                 else{
-                    Intent homeScreen = new Intent(getApplicationContext(),HomeScreen.class);
-                    homeScreen.putExtra("HomeObjectID", home.getObjectId());
+
                     subscribeToHomeFCMTopic(home.getObjectId());
-                    startActivity(homeScreen);
+
                 }
             }
         });
@@ -193,11 +195,27 @@ public class CreateHome extends AppCompatActivity {
                         String msg = "subscribe to home success";
                         if (!task.isSuccessful()) {
                             msg = "Subscribe to home failed";
+                            return;
                         }
 //                        TOPIC = "/topics/"+homeObjectId + "TOPIC";
 //                        loadRegistrationTokens();
+
                     }
                 });
+        user.put("HOMETOPIC", "/topics/"+ homeObjectId + "TOPIC");
+        user.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e == null){
+                    Intent homeScreen = new Intent(getApplicationContext(),HomeScreen.class);
+                    homeScreen.putExtra("HomeObjectID", homeObjectId);
+                    startActivity(homeScreen);
+                }
+                else{
+                    Log.d("CreateHome.java -> subscribeToHomeFCMTopic: ", e.getLocalizedMessage()+ "--------");
+                }
+            }
+        });
     }
 
     //helper method to quickly go back to Homes activity

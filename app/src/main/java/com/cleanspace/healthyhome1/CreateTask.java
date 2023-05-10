@@ -3,21 +3,19 @@ package com.cleanspace.healthyhome1;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
 
 import android.accessibilityservice.AccessibilityService;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Rect;
-import android.inputmethodservice.KeyboardView;
 import android.os.Bundle;
-import android.os.SystemClock;
-import android.text.format.DateFormat;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.KeyboardShortcutGroup;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -29,10 +27,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -96,20 +90,10 @@ public class CreateTask extends AppCompatActivity {
      * Paste somewhere in code,
      * Call keyboardDetector() in onCreate(),
      * modify keyboardDetector() as needed.
-     *  -in this case I have modified keyBoardDetector() to hide all
+     *  -in my case I have modified keyBoardDetector() to hide all
      *  un-used UI elements while keyboard is open.
      */
     boolean isKeyboardShowing = false;
-
-    /**
-     * TODO fix issue when user wants to immediatly create another task after another
-     *         issue: previously created task gets overwritten if user never reloads the activity.
-     *
-     *         Solution: switching back to HomeScreen after task is created.
-     *
-     *
-     */
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -161,18 +145,15 @@ public class CreateTask extends AppCompatActivity {
         assignToMemberItemClickListener();
     }
 
+
+
     /*\
      * Creates and saves task to the server.
      *
-     * */
-    /*TODO:
-     * -Assign task to clicked member from listview
-     * -radio button to select active/not active
+     *
+     *
      * */
     public void createTask(View view){
-
-
-
         task.put("Name", taskNameEditText.getText().toString());
         task.put("Home", selectedHomeObjectId);
         task.put("details",detailsEditText.getText().toString());
@@ -191,8 +172,16 @@ public class CreateTask extends AppCompatActivity {
             public void done(ParseException e) {
                 if(e == null){
                     taskHasObjectId = true;
-                    buildJSONMessageObject(isAssigned);
-                    scheduleTask();
+                   // buildJSONMessageObject(isAssigned);
+                    //scheduleTask();
+                    notificationWorkRequest();
+                    changeActivity(HomeScreen.class);
+//                    if(isAssigned){
+//                        broadCastWorkRequest();
+//                        /*TODO: Need to check if has due dateTime before sending a broadcast to create an alarm*/
+//                    }
+
+
                 }
                 else{
                     logToast("createTask()",e.getLocalizedMessage());
@@ -201,103 +190,100 @@ public class CreateTask extends AppCompatActivity {
             }
         });
     }
+    public void notificationWorkRequest(){
+        //sendNotification(notification);
+        WorkRequest sendNotificationWorkRequest = new OneTimeWorkRequest.Builder(
+                SendNotificationWorker.class).setInputData(
+                new Data.Builder().putString("title","New Task")
+                        //.putString("message", ParseUser.getCurrentUser().getUsername()+" has created a new task: " + taskNameEditText.getText().toString())
 
-    public void scheduleTask(){
-        //logToast("scheduleTask()"," called");
-
-        Calendar c = getCalendar();
-
-        if(dateOrTimeSet){
-            PendingIntent pendingIntent = putIntentData();
-
-            AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
-        }
-        else{
-            Toast.makeText(getApplicationContext(),"No time or date has been set for the task",Toast.LENGTH_SHORT).show();
-            Toast.makeText(getApplicationContext(),"dateOrTimeSet: "+ dateOrTimeSet,Toast.LENGTH_SHORT).show();
-        }
-        changeActivity(HomeScreen.class);
-
+                        .putString("taskName",taskNameEditText.getText().toString())
+                        .putString("message", "A new task has been created!")
+                        .putString("taskDetails", detailsEditText.getText().toString())
+                        .putLong("alarmTimeMillis", 10000)
+                        .putString("HomeObjectID",selectedHomeObjectId)
+                        .putBoolean("isAssigned", isAssigned)
+                        .putString("PERSONALTOPIC", "/topics/"+task.get("assignToObjectId").toString()+ "TOPIC")
+                        .putString("TOPIC",TOPIC).build()
+        ).build();
 
 
-       //use this to cancel an intent
-       // PendingIntent.getService(this.getApplicationContext(),234324243,intent,PendingIntent.FLAG_NO_CREATE);
+        WorkManager.getInstance(getApplicationContext()).enqueue(sendNotificationWorkRequest);
     }
 
-    public Calendar getCalendar(){
-        Calendar c = GregorianCalendar.getInstance();
-        if(dateSet && timeSet){
-            c.set(year,month,dayOfMonth,hourOfDay,minute);
-            dateOrTimeSet = true;
-          //  logToast("dateSet & timeSet", c.getTime().toString());
-        }
-        else if(timeSet){
-            c.set(Calendar.HOUR_OF_DAY, hourOfDay);
-            c.set(Calendar.MINUTE, minute);
-            dateOrTimeSet = true;
-           // logToast("only timeSet", c.getTime().toString());
-        }
-        else if(dateSet){
-            c.set(year,month,dayOfMonth,0,0);
-            dateOrTimeSet = true;
-           // logToast("only dateSet", c.getTime().toString());
-        }
-        else{
-            dateOrTimeSet = false;
-           // logToast("no date or time set", c.getTime().toString());
-        }
-        return c;
-    }
+//    public Calendar getCalendar(){
+//        Calendar c = GregorianCalendar.getInstance();
+//        if(dateSet && timeSet){
+//            c.set(year,month,dayOfMonth,hourOfDay,minute);
+//            dateOrTimeSet = true;
+//          //  logToast("dateSet & timeSet", c.getTime().toString());
+//        }
+//        else if(timeSet){
+//            c.set(Calendar.HOUR_OF_DAY, hourOfDay);
+//            c.set(Calendar.MINUTE, minute);
+//            dateOrTimeSet = true;
+//           // logToast("only timeSet", c.getTime().toString());
+//        }
+//        else if(dateSet){
+//            c.set(year,month,dayOfMonth,0,0);
+//            dateOrTimeSet = true;
+//           // logToast("only dateSet", c.getTime().toString());
+//        }
+//        else{
+//            dateOrTimeSet = false;
+//           // logToast("no date or time set", c.getTime().toString());
+//        }
+//        return c;
+//    }
 
-    public PendingIntent putIntentData(){
-        Intent intent = new Intent(this, HealthyHomeBroadcastReceiverOne.class);
-
-        intent.putExtra("taskName", task.get("Name").toString());
-        intent.putExtra("taskDetails",task.get("details").toString());
-        intent.putExtra("isAssigned", task.get("isAssigned").toString());
-
-        intent.putExtra("TOPIC", TOPIC);
-        if(isReoccuring){
-            /*
-            * TODO: Need to also include interval data
-            * */
-            intent.putExtra("isReoccurring",true);
-            intent.putExtra("year",year);
-            intent.putExtra("month",month);
-            intent.putExtra("dayOfMonth",dayOfMonth);
-            intent.putExtra("hourOfDay",hourOfDay);
-            intent.putExtra("minute",minute);
-
-        }
-        else{
-            intent.putExtra("isReoccurring",false);
-        }
-
-        if(isAssigned){
-            intent.putExtra("assignToObjectId", task.get("assignToObjectId").toString());
-            intent.putExtra("PERSONALTOPIC", "/topics/"+task.get("assignToObjectId").toString()+ "TOPIC");
-        }
-
-
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this.getApplicationContext(), Integer.valueOf(generateID()), intent, 0);
-
-        return pendingIntent;
-    }
+//    public PendingIntent putIntentData(){
+//        Intent intent = new Intent(this, HealthyHomeBroadcastReceiverOne.class);
+//
+//        intent.putExtra("taskName", task.get("Name").toString());
+//        intent.putExtra("taskDetails",task.get("details").toString());
+//        intent.putExtra("isAssigned", task.get("isAssigned").toString());
+//
+//        intent.putExtra("TOPIC", TOPIC);
+//        if(isReoccuring){
+//            /*
+//            *
+//            * */
+//            intent.putExtra("isReoccurring",true);
+//            intent.putExtra("year",year);
+//            intent.putExtra("month",month);
+//            intent.putExtra("dayOfMonth",dayOfMonth);
+//            intent.putExtra("hourOfDay",hourOfDay);
+//            intent.putExtra("minute",minute);
+//
+//        }
+//        else{
+//            intent.putExtra("isReoccurring",false);
+//        }
+//
+//        if(isAssigned){
+//            intent.putExtra("assignToObjectId", task.get("assignToObjectId").toString());
+//            intent.putExtra("PERSONALTOPIC", "/topics/"+task.get("assignToObjectId").toString()+ "TOPIC");
+//        }
+//
+//
+//        PendingIntent pendingIntent = PendingIntent.getBroadcast(this.getApplicationContext(), Integer.valueOf(generateID()), intent, 0);
+//
+//        return pendingIntent;
+//    }
 
     //Simple random 4 character ID generator, 10^4 = 10,000 possible combinations. 0000 - 9999
-    public String generateID(){
-        String IDstring = "";
-        Random random = new Random();
-
-        for(int i = 0; i < 4; i++){
-            IDstring += Integer.toString(random.nextInt(10));
-        }
-        return IDstring;
-    }
-    public void setInterval(){
-
-    }
+//    public String generateID(){
+//        String IDstring = "";
+//        Random random = new Random();
+//
+//        for(int i = 0; i < 4; i++){
+//            IDstring += Integer.toString(random.nextInt(10));
+//        }
+//        return IDstring;
+//    }
+//    public void setInterval(){
+//
+//    }
 
     public void setTime(int hourOfDay, int minute, String status){
         Calendar c = Calendar.getInstance();
@@ -522,65 +508,74 @@ public class CreateTask extends AppCompatActivity {
      * This object will contain the receiver’s topic, notification title,
      * notification message, and other key/value pairs to add.
      * */
-    public void buildJSONMessageObject(boolean isAssigned){
-        JSONObject notification = new JSONObject();
-        JSONObject notificationBody = new JSONObject();
-        if(isAssigned){
-            try {
-                notificationBody.put("title", "New Task");
-                notificationBody.put("message", ParseUser.getCurrentUser().getUsername()+" has assigned " +
-                        assignedMember.get("name") + " to " + task.get("Name"));
+//    public void buildJSONMessageObject(boolean isAssigned){//
+//        JSONObject notification = new JSONObject();
+//        JSONObject notificationBody = new JSONObject();
+//        if(isAssigned){
+//            try {
+//                notificationBody.put("title", "New Task");
+//                notificationBody.put("message", ParseUser.getCurrentUser().getUsername()+" has assigned " +
+//                        assignedMember.get("name") + " to " + task.get("Name"));
+//
+//                notification.put("to", TOPIC);
+//                //notification.put("registration_ids",registrationTokens);
+//                notification.put("data", notificationBody);
+//            } catch ( JSONException e) {
+//                logToast("JSONException isAssigned = true", e.getLocalizedMessage());
+//            }
+//        }
+//        else{
+//            try {
+//                notificationBody.put("title", "New Task");
+//                notificationBody.put("message", ParseUser.getCurrentUser().getUsername()+" has created a new task: " + task.get("Name"));
+//
+//                notification.put("to", TOPIC);
+//                //notification.put("registration_ids",registrationTokens);
+//                notification.put("data", notificationBody);
+//            } catch ( JSONException e) {
+//                logToast("JSONException isAssigned = false", e.getLocalizedMessage());
+//            }
+//        }
+//        sendNotification(notification);
+//    }
+    /*creates a work request for the SendNotificationWorker to send a notification using fcm to users or user of a home*/
 
-                notification.put("to", TOPIC);
-                //notification.put("registration_ids",registrationTokens);
-                notification.put("data", notificationBody);
-            } catch ( JSONException e) {
-                logToast("JSONException isAssigned = true", e.getLocalizedMessage());
-            }
-        }
-        else{
-            try {
-                notificationBody.put("title", "New Task");
-                notificationBody.put("message", ParseUser.getCurrentUser().getUsername()+" has created a new task: " + task.get("Name"));
+    /*This work request creates a work request along with information about the alram for
+    * the SendBroadcastWorker to send a broadcast to trigger/create the alarm*/
+//    public void broadCastWorkRequest(){
+//        WorkRequest sendBroadCastWorkRequest = new OneTimeWorkRequest.Builder(
+//                SendBroadcastWorker.class).setInputData(new Data.Builder().putString("taskName", "task name").putString("taskDetails", "task details").putLong("alarmTimeMilli", 10000).build()).build();
+//    }
 
-                notification.put("to", TOPIC);
-                //notification.put("registration_ids",registrationTokens);
-                notification.put("data", notificationBody);
-            } catch ( JSONException e) {
-                logToast("JSONException isAssigned = false", e.getLocalizedMessage());
-            }
-        }
-        sendNotification(notification);
-    }
 
     /*
      *make a network request to FCM server using Volley library,
      *then the server will use the request parameters to route the
      *notification to the targeted device.
      * */
-    public void sendNotification(JSONObject notification){
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(getString(R.string.FCM_API), notification,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        logToast("CreateTask.activity JsonObjectRequestResponse", response.toString());
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                logToast("CreateTask.activity JsonObjectRequest--ERROR--Response", error.getLocalizedMessage());
-            }
-        }){
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("Authorization","key="+getString(R.string.server_key));
-                params.put("Content-Type", getString(R.string.content_type));
-                return params;
-            }
-        };
-        MySingleton.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
-    }
+//    public void sendNotification(JSONObject notification){
+//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(getString(R.string.FCM_API), notification,
+//                new Response.Listener<JSONObject>() {
+//                    @Override
+//                    public void onResponse(JSONObject response) {
+//                        logToast("CreateTask.activity JsonObjectRequestResponse", response.toString());
+//                    }
+//                }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                logToast("CreateTask.activity JsonObjectRequest--ERROR--Response", error.getLocalizedMessage());
+//            }
+//        }){
+//            @Override
+//            public Map<String, String> getHeaders() throws AuthFailureError {
+//                Map<String, String> params = new HashMap<>();
+//                params.put("Authorization","key="+getString(R.string.server_key));
+//                params.put("Content-Type", getString(R.string.content_type));
+//                return params;
+//            }
+//        };
+//        MySingleton.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
+//    }
 
     void onKeyboardVisibilityChanged(boolean opened) {
 //        if(opened == false){
@@ -612,6 +607,7 @@ public class CreateTask extends AppCompatActivity {
                                 detailsTextView.setVisibility(View.GONE);
                                 createTaskButton.setVisibility(View.GONE);
                                 membersListView.setVisibility(View.GONE);
+                                bottomNavigationView.setVisibility(View.GONE);
                             }
                         }
                         else {

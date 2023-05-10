@@ -40,7 +40,6 @@ public class CreateMemberActivity extends AppCompatActivity {
     * so that the Array column for that user is not undifined.
     * */
     public void submit(View view){
-        /* TODO submit member profile data to parse server and Log Into Home Dashboard */
        if(allTextFieldsFilled()){
            if(passwordMatch()){
                EditText name = findViewById(R.id.nameEditText);

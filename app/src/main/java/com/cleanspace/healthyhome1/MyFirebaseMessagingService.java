@@ -18,6 +18,11 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
+
 import android.util.Log;
 import android.widget.Toast;
 
@@ -27,6 +32,7 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.util.Objects;
 import java.util.Random;
 
 //Cant resolve symbol error on imports below
@@ -49,6 +55,7 @@ import java.util.Random;
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private static final String TAG = "MyFirebaseMsgService";
+    public String selectedHomeObjectId;
 
     /**
      * Called when message is received.
@@ -58,6 +65,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     // [START receive_message]
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
+        logToast("MyFireBaseMessagingService.java.java -> onMessagedReceived()", "----------------------------");
         // [START_EXCLUDE]
         // There are two types of messages data messages and notification messages. Data messages
         // are handled
@@ -73,9 +81,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         // sends notification
         // messages. For more see: https://firebase.google.com/docs/cloud-messaging/concept-options
         // [END_EXCLUDE]
-
-        // TODO(developer): Handle FCM messages here.
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
+
+
 
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
@@ -87,6 +95,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 //                // Handle message within 10 seconds
 //                handleNow(remoteMessage);
 //            }
+            if(remoteMessage.getData().get("alarmTimeMillis") != null){
+                createAlarmWorkRequest(remoteMessage.getData().get("taskName"), remoteMessage.getData().get("taskDetails"), Integer.parseInt(Objects.requireNonNull(remoteMessage.getData()
+                        .get("alarmTimeMillis"))));
+                logToast("MyFireBaseMessagingService.java.java -> AlarmTimeMillis Not Null :)", "----------------------------");
+            }
+            else if (remoteMessage.getData().get("title").equals("Request")) {
+                logToast("MyFireBaseMessagingService.java.java -> onMessageReceived() -> Request Not Null :)", "----------------------------");
+            }
 
         }
 
@@ -199,6 +215,18 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 //
 //        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
 //    }
+public void createAlarmWorkRequest(String taskName, String taskDetails, long alarmTimeMillis){
+    WorkRequest CreateAlarmWorkRequest = new OneTimeWorkRequest.Builder(
+            CreateAlarmWorker.class).setInputData(new Data.Builder()
+                    .putString("taskName", taskName)
+                    .putString("taskDetails", taskDetails)
+                    .putLong("alarmTimeMilli", alarmTimeMillis)
+                    .build())
+            .build();
+
+    WorkManager.getInstance(getApplicationContext()).enqueue(CreateAlarmWorkRequest);
+    logToast("CreateAlarmWorkRequest Enqueued!!!", "----------------------------");
+}
 
     private void constructNotificationFromMessage(RemoteMessage remoteMessage){
 
@@ -212,10 +240,47 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
 
 
-        final Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this , 0, intent,
-                PendingIntent.FLAG_ONE_SHOT);
+        final Intent sendTaskInfo = new Intent(this, HomeScreen.class);
+        Log.d(" MyFireBaseMessagingService.java.java -> Received Intent:", sendTaskInfo +"--------------");
+        if(remoteMessage.getData().get("HomeObjectID") == null){
+            logToast("MyFireBaseMessagingService.java.java -> constructNotificationFromMessage(RemoteMessage remoteMessage) -> HomeObjectID", "is null--------------");
+        }
+        else{
+            logToast("MyFireBaseMessagingService.java.java -> construct..()) -> HomeObjectID", remoteMessage.getData().get("HomeObjectID")+"--------------");
+            sendTaskInfo.putExtra("HomeObjectID", remoteMessage.getData().get("HomeObjectID"));
+
+            if(remoteMessage.getData().get("alarmTimeMillis") != null){
+                sendTaskInfo.putExtra("notification",remoteMessage.getData().get("HomeObjectID"));
+                logToast("MyFireBaseMessagingService.java.java -> construct..() -> alarmTimeMillis Not Null :)", "----------------------------");
+            }
+
+            else if (remoteMessage.getData().get("title").equals("Request")) {
+                logToast("MyFireBaseMessagingService.java.java -> construct..() -> Request Not Null :)", "----------------------------");
+                sendTaskInfo.putExtra("Request",(remoteMessage.getData().get("title")));
+                sendTaskInfo.putExtra("HomeObjectID",remoteMessage.getData().get("HomeObjectID"));
+                logToast("MyFirebaseMessagingService.java -> construct..() received home objectId:", remoteMessage.getData().get("HomeObjectID"));
+                sendTaskInfo.putExtra("requestedUserObjectID",remoteMessage.getData().get("requestedUserObjectID"));
+                sendTaskInfo.putExtra("topic",remoteMessage.getData().get("topic"));
+                sendTaskInfo.putExtra("personalTopic",remoteMessage.getData().get("personalTopic"));
+            }
+            else if (remoteMessage.getData().get("title").equals("Accepted!") ) {
+                addUserToHomeWorkRequest(remoteMessage.getData().get("HomeObjectID"), remoteMessage.getData().get("requestedUserObjectID")
+                        , remoteMessage.getData().get("topic")
+                        ,remoteMessage.getData().get("personalTopic"));
+
+                logToast("MyFireBaseMessagingService.java.java -> construct..() -> Join Request :", "ACCEPTED----------------------------");
+            }
+            else if(remoteMessage.getData().get("title").equals("Denied..")){
+                logToast("MyFireBaseMessagingService.java.java -> construct..() -> Join Request :", "DENIED----------------------------");
+            }
+            sendTaskInfo.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        }
+
+
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(this , notificationID, sendTaskInfo,
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+
 
 //        Bitmap largeIcon = BitmapFactory.decodeResource(getResources(),
 //                R.drawable.notify_icon);
@@ -230,10 +295,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 .setSound(notificationSoundUri)
                 .setContentIntent(pendingIntent);
 
+
         //Set notification color to match your app color template
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            notificationBuilder.setColor(getResources().getColor(R.color.Pink));
-        }
+        notificationBuilder.setColor(getResources().getColor(R.color.Pink));
         notificationManager.notify(notificationID, notificationBuilder.build());
     }
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -250,6 +314,23 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         if (notificationManager != null) {
             notificationManager.createNotificationChannel(adminChannel);
         }
+    }
+    public void addUserToHomeWorkRequest(String foundHomeObjectID, String requestedUserObjectID, String topic, String personalTopic){
+        WorkRequest addUserToHomeWorkRequest = new OneTimeWorkRequest.Builder(
+                AddUserToHomeWorker.class).setInputData(new Data.Builder()
+                        .putString("foundHomeObjectID", foundHomeObjectID)
+                        .putString("requestedUserObjectID", requestedUserObjectID)
+                        .putString("topic", topic)
+                        .putString("personalTopic", personalTopic)
+                        .build())
+                .build();
+
+        WorkManager.getInstance(getApplicationContext()).enqueue(addUserToHomeWorkRequest);
+        logToast("addUserToHomeWorkRequest Enqueued!!!", "----------------------------");
+    }
+    public void logToast(String tag, String text) {
+        Log.d(tag, text);
+
     }
 
 

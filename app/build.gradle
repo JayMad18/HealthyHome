@@ -1,15 +1,15 @@
 plugins {
     id 'com.android.application'
+    id 'com.google.gms.google-services'
 }
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.2"
+    compileSdkVersion 33
 
     defaultConfig {
         applicationId "com.cleanspace.healthyhome1"
         minSdkVersion 27
-        targetSdkVersion 30
+        targetSdkVersion 33
         versionCode 2
         versionName "1.2"
 
@@ -23,8 +23,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_16
+        targetCompatibility JavaVersion.VERSION_16
     }
     sourceSets {
         main {
@@ -72,4 +72,29 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     implementation 'com.google.android.material:material:<1.4.0-alpha01>'
     implementation "com.github.parse-community.Parse-SDK-Android:parse:1.26.0"
+
+    //WorkManager Dependencies---------------------------------------------
+    def work_version = "2.8.0"
+
+    // (Java only)
+    implementation "androidx.work:work-runtime:$work_version"
+
+    // Kotlin + coroutines
+    implementation "androidx.work:work-runtime-ktx:$work_version"
+
+    // optional - RxJava2 support
+    implementation "androidx.work:work-rxjava2:$work_version"
+
+    // optional - GCMNetworkManager support
+    implementation "androidx.work:work-gcm:$work_version"
+
+    // optional - Test helpers
+    androidTestImplementation "androidx.work:work-testing:$work_version"
+
+    // optional - Multiprocess support
+    implementation "androidx.work:work-multiprocess:$work_version"
+    //WorkManager Dependencies---------------------------------------------END
+
+    //Gson library
+    implementation 'com.google.code.gson:gson:2.10.1'
 }
