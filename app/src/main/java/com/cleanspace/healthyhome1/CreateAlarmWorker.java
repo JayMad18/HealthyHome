@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -22,12 +23,16 @@ public class CreateAlarmWorker extends Worker {
         super(context, workerParams);
     }
 
+    @SuppressLint("ObsoleteSdkInt")
     @NonNull
     @Override
     public Result doWork() {
         String taskName = getInputData().getString("taskName");
         String taskDetails = getInputData().getString("taskDetails");
         long alarmTimeMillis = getInputData().getLong("alarmTimeMillis", 10000);
+        /*
+        * TODO: use the year,month,dayOfMonth, and time to create new calender instance and set the date and time and pass to alarManager as cal.getTimeInMillis()
+        * */
 
         AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
 

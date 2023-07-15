@@ -121,7 +121,7 @@ public class Homes extends AppCompatActivity {
 
                     }
                     else{
-                        logToast("ERROR Homes.java -> searchHome(): " , e.getLocalizedMessage() +"------------");
+                        logToast("ERROR Homes.java -> searchHome(): " ,  "Error on home id search------------");
                     }
 
                     resultsView.setText(foundHomeName);

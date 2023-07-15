@@ -9,6 +9,7 @@ import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
 import android.accessibilityservice.AccessibilityService;
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -42,6 +43,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -50,6 +52,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import static java.time.temporal.ChronoUnit.MILLIS;
 
 public class CreateTask extends AppCompatActivity {
     EditText taskNameEditText, detailsEditText;
@@ -69,6 +72,8 @@ public class CreateTask extends AppCompatActivity {
     boolean isAssigned, taskHasObjectId, isReoccuring, dateSet, timeSet, dateOrTimeSet;
 
     int position, hourOfDay, minute, year, month, dayOfMonth;
+
+    long dateInMilliseconds;
 
 
 
@@ -176,10 +181,40 @@ public class CreateTask extends AppCompatActivity {
                     //scheduleTask();
                     notificationWorkRequest();
                     changeActivity(HomeScreen.class);
-//                    if(isAssigned){
-//                        broadCastWorkRequest();
-//                        /*TODO: Need to check if has due dateTime before sending a broadcast to create an alarm*/
-//                    }
+
+                    if(isAssigned){//Send notification to that person
+                        /*
+                         * TODO:
+                             *   if(DueDateTime){
+                             *    if(isRepeating){
+                             *          send THAT PERSON an intent to create alarm with intent data about repeating schedule along with notification
+                             *     }
+                             *    else{
+                             *          send THAT PERSON an intent to create alarm along with notification
+                             *     }
+                             *   }
+                             *   else{
+                             *     only send notification to THAT PERSON no intent to create alarm.
+                             *   }
+                         * */
+
+                    }
+                    else{//Send notificaiton to everyone
+                        /*
+                        TODO:
+                             *   if(DueDateTime){
+                             *    if(isRepeating){
+                             *          send ALL MEMBERS an intent to create alarm with intent data about repeating schedule along with notification
+                             *     }
+                             *    else{
+                             *          send ALL MEMBERS an intent to create alarm along with notification
+                             *     }
+                             *   }
+                             *   else{
+                             *     only send notification to ALL MEMBERS no intent to create alarm.
+                             *   }
+                        * */
+                    }
 
 
                 }
@@ -285,6 +320,7 @@ public class CreateTask extends AppCompatActivity {
 //
 //    }
 
+    @SuppressLint("SetTextI18n")
     public void setTime(int hourOfDay, int minute, String status){
         Calendar c = Calendar.getInstance();
 
@@ -322,8 +358,10 @@ public class CreateTask extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     public void setDate(int year, int month, int dayOfMonth){
         Calendar c = Calendar.getInstance();
+
         if(year <  c.get(Calendar.YEAR) ||
                 (year ==  c.get(Calendar.YEAR) &&  month < c.get(Calendar.MONTH)) ||
                 (year ==  c.get(Calendar.YEAR) &&  month == c.get(Calendar.MONTH) && dayOfMonth < c.get(Calendar.DAY_OF_MONTH))){
@@ -335,22 +373,72 @@ public class CreateTask extends AppCompatActivity {
             this.month = month;
             this.dayOfMonth = dayOfMonth;
 
+            Calendar setDate = Calendar.getInstance();
+            setDate.set(Calendar.YEAR, year);
+            setDate.set(Calendar.MONTH, month);
+            setDate.set(Calendar.DAY_OF_MONTH,dayOfMonth);
+
             dateTextView.setText(month + 1 + "/" + dayOfMonth + "/" + year);
-            askIfRepeating();
+            dateInMilliseconds = convertToMilliseconds(setDate, c);
+
+            /*
+            * TODO: convert (date set - today's date) to milliseconds for one time alarm.
+            *
+            *
+            */
+
         }
     }
+
+    public long convertToMilliseconds(Calendar setDate, Calendar today){
+        long millis = MILLIS.between((Temporal) setDate, (Temporal) today);
+        logToast("CreateTask.java -> convertToMilliseconds(): today", today.toString() + "--------------");
+        logToast("CreateTask.java -> convertToMilliseconds(): today", setDate.toString() + "--------------");
+        logToast("CreateTask.java -> convertToMilliseconds(): Milli seconds between", String.valueOf(millis) + "--------------");
+        return millis;
+    }
+
+
     /*
      * a dialog that just asks if this task is repeating. Leads to another dialog
      * */
     public void askIfRepeating(){
         new AlertDialog.Builder(this).setTitle("Repeat").setMessage("Do you need this task to repeat?")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                .setPositiveButton("Yes", getRepClickView()).setNegativeButton("No", getOneClickView()).show();
+
+
+        /*
+        * TODO: "ask if repeating" when user clicks "set date", if repeating call interval select dialog then save date and time to database also save isReoccuring to true,
+        *  if not repeating call code that is located within showTimePickerDialog(View v) then save date and time to database also save isReoccuring to true.
+        *
+        *           -Need to send intent data to tell if alarm is reoccuring.
+        *
+        *
+        * */
+    }
+
+    public DialogInterface.OnClickListener getOneClickView(){
+        DialogInterface.OnClickListener oneTimeClick = new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialogInterface, int i) {
+                DialogFragment newFragment = new DatePickerFragment();
+                newFragment.show(getSupportFragmentManager(), "DatePicker");
+            }
+        };
+
+        return oneTimeClick;
+    }
+
+    public DialogInterface.OnClickListener getRepClickView(){
+        DialogInterface.OnClickListener repeatingClick = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
                 intervalSelectDialog();
             }
-        }).setNegativeButton("No", null).show();
+        };
+        return repeatingClick;
     }
+
     public void intervalSelectDialog(){
         new AlertDialog.Builder(this).setView(R.layout.dialog_repeating).show();
     }
@@ -362,8 +450,8 @@ public class CreateTask extends AppCompatActivity {
     }
 
     public void showDatePickerDialog(View v){
-        DialogFragment newFragment = new DatePickerFragment();
-        newFragment.show(getSupportFragmentManager(), "DatePicker");
+        askIfRepeating();
+
     }
 
     public void logToast(String tag, String text){
@@ -387,7 +475,6 @@ public class CreateTask extends AppCompatActivity {
                     }
                     memberNamesAdapter.notifyDataSetChanged();
                     membersListView.setAdapter(memberNamesAdapter);
-                }else{
                 }
             }
         });
