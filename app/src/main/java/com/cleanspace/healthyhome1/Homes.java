@@ -2,10 +2,17 @@ package com.cleanspace.healthyhome1;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -37,6 +44,8 @@ public class Homes extends AppCompatActivity {
     ParseObject foundHomeObject;
     ParseUser user;
 
+    private static final int REQUEST_CODE = 1234;
+
     //Includes setLogoutListener to listen for logout as soon as activity is created
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +56,9 @@ public class Homes extends AppCompatActivity {
         retrieveCurrentFCMRegistrationToken();
         user = ParseUser.getCurrentUser();
 
+
     }
+
 
     /*
     * Switched to the CreateHome activity.
@@ -88,7 +99,7 @@ public class Homes extends AppCompatActivity {
     public void searchHome(View view){
         TextView resultsView = findViewById(R.id.searchResults);
         EditText searchExistingHomeEditText = findViewById(R.id.searchExistingHomeEditText);
-
+        logToast("Homes.java -> searchHome() entered into editText: " , searchExistingHomeEditText.getText().toString() +"------------");
         ParseQuery<ParseObject> idQuery = ParseQuery.getQuery("Homes");
         idQuery.whereEqualTo("ID",searchExistingHomeEditText.getText().toString());
         idQuery.findInBackground(new FindCallback<ParseObject>() {
@@ -99,10 +110,18 @@ public class Homes extends AppCompatActivity {
                     String foundHomeName = "";
 
                     if(objects.size() > 0){
+                        for (ParseObject object : objects) {
+                            if(object.getString("ID").equals(searchExistingHomeEditText.getText().toString())){
+                                logToast("Homes.java -> searchHome(): objectID : editText value ->" , object.getString("ID") +":" + searchExistingHomeEditText.getText().toString() + " ------------");
+                            }
+                        }
                         foundHomeObject = objects.get(0);
                         foundHomeName += objects.get(0).getString("HomeName") + "\n";
+                        logToast("Homes.java -> searchHome(): objectId at index 0 : editText value ->" , foundHomeObject.getString("ID") +":" + searchExistingHomeEditText.getText().toString() + " ------------");
+
                     }
                     else{
+                        logToast("ERROR Homes.java -> searchHome(): " ,  "Error on home id search------------");
                     }
 
                     resultsView.setText(foundHomeName);
@@ -123,7 +142,6 @@ public class Homes extends AppCompatActivity {
     * with the Intent.
     * */
     public void viewHome(View view){
-        //TODO: go to "ViewHome" activity to view home details and send join request.
         EditText searchExistingHomeEditText = findViewById(R.id.searchExistingHomeEditText);
         Intent viewHome = new Intent(getApplicationContext(), ViewHome.class);
         viewHome.putExtra("HomeId", searchExistingHomeEditText.getText().toString());
@@ -159,6 +177,7 @@ public class Homes extends AppCompatActivity {
             }
         }).setNegativeButton("No", null).show();
     }
+
     //logout in its own method
     public void logout(){
         user.put("isLoggedIn",false);
@@ -194,8 +213,59 @@ public class Homes extends AppCompatActivity {
 
     //helper method show a user's homes when multi home feature is implemented
     public void showUsersHomes(View view){
+        AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (alarmManager.canScheduleExactAlarms()) {
+                // proceed with the action (setting exact alarms)
+                //alarmManager.setExact(...)
+                //("Thanks:","Thank you for allowing healthyhome to schedule alarms for you");
+            }
+            else {
+                logToast("IMPORTANT:","HealthyHome will not work properly if it cannot schedule alarms for you");
+                // permission not yet approved. Display user notice and gracefully degrade
+                //your app experience.
+                        //alarmManager.setWindow(...)
+            }
+        }
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SCHEDULE_EXACT_ALARM) != PackageManager.PERMISSION_GRANTED) {
+//            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.SCHEDULE_EXACT_ALARM }, REQUEST_CODE);
+//            logToast("IMPORTANT:","HealthyHome will not work properly if it cannot schedule alarms for you");
+//        }
         changeActivity(MyHomes.class);
     }
+//    public void onRequestPermissionsResult(int requestCode,  @NonNull int[] grantResults) {
+//        if (requestCode == REQUEST_CODE) {
+//            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                logToast("Thanks:","Thank you for allowing healthyhome to schedule alarms for you");
+//            } else {
+//                logToast("IMPORTANT:","HealthyHome will not work properly if it cannot schedule alarms for you");
+//            }
+//        }
+//    }
+    protected void onResume() {
+        super.onResume();
+        AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (alarmManager.canScheduleExactAlarms()) {
+                // proceed with the action (setting exact alarms)
+                //alarmManager.setExact(...)
+                logToast("onResume()","---------------------");
+            }
+            else {
+                logToast("IMPORTANT:","HealthyHome will not work properly if it cannot schedule alarms for you");
+                // permission not yet approved. Display user notice and gracefully degrade
+                //your app experience.
+                //alarmManager.setWindow(...)
+            }
+        }
+
+//        setBottomNavListener();
+//        retrieveCurrentFCMRegistrationToken();
+//        user = ParseUser.getCurrentUser();
+
+
+    }
+
 
     //A token produced by FCM to identify the device not the user
     //used to send a notification from console to a specific device.
@@ -231,5 +301,9 @@ public class Homes extends AppCompatActivity {
                 }
             }
         });
+    }
+    public void logToast(String tag, String text) {
+        Log.d(tag, text);
+        Toast.makeText(getApplicationContext(), tag + ": " + text, Toast.LENGTH_LONG).show();
     }
 }

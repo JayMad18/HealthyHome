@@ -72,7 +72,6 @@ public class ShowMembers extends AppCompatActivity {
           @Override
           public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
               Intent sendUserInfo = new Intent(getApplicationContext(), UserInfo.class);
-              //TODO: start new activity showing clicked user info.
               ParseUser selectedUser = parseUsers.get(position);
               sendUserInfo.putExtra("objectId", selectedUser.getObjectId());
               sendUserInfo.putExtra("name", selectedUser.get("name").toString());

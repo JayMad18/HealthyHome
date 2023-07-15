@@ -5,6 +5,10 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -75,6 +79,10 @@ public class ViewHome extends AppCompatActivity {
     String TOPIC;
     String PERSONALTOPIC;
 
+    ParseUser user;
+    ArrayList<String> membersList = new ArrayList<String>();
+    ArrayList<String> homesList = new ArrayList<String>();
+
     /*
     * onCreate() method recieves intent and data sent with intent after creating activity
     *
@@ -87,7 +95,9 @@ public class ViewHome extends AppCompatActivity {
 
         Intent sentHomeId = getIntent();
 
+        logToast("ViewHome.java -> getHome() onCreate() sentHomeId.getStringExtra:", sentHomeId.getStringExtra("HomeId")+ "--------------");
         String homeId = sentHomeId.getStringExtra("HomeId");
+        logToast("ViewHome.java -> getHome() onCreate() homeId:", homeId+ "--------------");
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
 
@@ -97,6 +107,10 @@ public class ViewHome extends AppCompatActivity {
 
     }
 
+    public void logToast(String tag, String text) {
+        Log.d(tag, text);
+
+    }
     /*
     * This method uses the homeId sent with the Intent in a query to find the particular Home's details
     * once home is found it calls the populateMembersAndTaskViews(String) method
@@ -110,6 +124,7 @@ public class ViewHome extends AppCompatActivity {
         //Replace with homeIdQuery.getFirstInBackground(new GetCallBack<ParseObject>() {...});
         ParseQuery<ParseObject> homeIdQuery = ParseQuery.getQuery("Homes");
         homeIdQuery.whereEqualTo("ID", homeId);
+        logToast("ViewHome.java -> getHome() homeId:", homeId+ "--------------");
         homeIdQuery.include("MembersList");
         homeIdQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -140,8 +155,9 @@ public class ViewHome extends AppCompatActivity {
                             }
                             else if(item.getItemId() == R.id.joinItem){
 
-                                //TODO:Send Join request to members of the retrieved home to be accepted or rejected. Via Push Notification.
-                                addMemberToHome();
+
+                                sendRequestNotificationWorkRequest();
+                                //addMemberToHome();
                             }
                             return false;
                         }
@@ -154,95 +170,116 @@ public class ViewHome extends AppCompatActivity {
         });
     }
 
+    public void sendRequestNotificationWorkRequest(){
+        user = ParseUser.getCurrentUser();
+
+        WorkRequest sendRequestNotificationWorkRequest = new OneTimeWorkRequest.Builder(
+                SendRequestNotificationWorker.class).setInputData(
+                new Data.Builder().putString("title","New Task")
+                        .putString("foundHomeObjectID",foundHomeObject.getObjectId())
+                        .putString("requestedUserObjectID", user.getObjectId())
+                        //.putStringArray("membersList", (String[]) foundHomeObject.getList("MembersList").toArray())
+                        //.putStringArray("homesList", (String[]) user.getList("HomeList").toArray())
+                        .putString("topic", "/topics/"+foundHomeObject.getObjectId() + "TOPIC")
+                        .putString("personalTopic","/topics/"+ParseUser.getCurrentUser().getObjectId() + "TOPIC")
+                        .build()
+        ).build();
+
+
+        WorkManager.getInstance(getApplicationContext()).enqueue(sendRequestNotificationWorkRequest);
+    }
+
+
     /*
     * Called by the bottomNav listener method whenever the backItem is NOT clicked.
     * adds the current session user to the home
     * in the future it will first send a join request push notification to current members of the home
     * to be accepted or rejected.
     * */
-    public void addMemberToHome(){
-        ParseUser user = ParseUser.getCurrentUser();
+//    public void addMemberToHome(){
+//        user = ParseUser.getCurrentUser();
+//
+//        //Home saves user to MembersList arraylist
+//        membersList = (ArrayList) foundHomeObject.getList("MembersList");
+//        homesList = (ArrayList) user.getList("HomeList");
+//        if(!membersList.contains(user.getObjectId()) && !homesList.contains(foundHomeObject.getObjectId())){
+//            membersList.add(user.getObjectId());
+//            foundHomeObject.put("MembersList", membersList);
+//            foundHomeObject.saveInBackground(new SaveCallback() {
+//                @Override
+//                public void done(ParseException e) {
+//                    if(e != null){
+//                    }
+//                    else{
+//                        saveHomeToArrayList(user, foundHomeObject);
+//
+//                    }
+//                }
+//            });
+//        }
+//        else{//self explanitory
+//        }
+//
+//    }
 
-        //Home saves user to MembersList arraylist
-        ArrayList<String> membersList = (ArrayList) foundHomeObject.getList("MembersList");
-        ArrayList<String> homesList = (ArrayList) user.getList("HomeList");
-        if(!membersList.contains(user.getObjectId()) && !homesList.contains(foundHomeObject.getObjectId())){
-            membersList.add(user.getObjectId());
-            foundHomeObject.put("MembersList", membersList);
-            foundHomeObject.saveInBackground(new SaveCallback() {
-                @Override
-                public void done(ParseException e) {
-                    if(e != null){
-                    }
-                    else{
-                        saveHomeToArrayList(user, foundHomeObject);
-
-                    }
-                }
-            });
-        }
-        else{//self explanitory
-        }
-
-    }
     /*
      * Called when the user joins the home
      * this method adds this home to the user's list of homes that he/she is currently apart of.
      * */
-    public void saveHomeToArrayList(ParseUser user, ParseObject home){
-        ArrayList<String> homesList = (ArrayList) user.getList("HomeList");
-        homesList.add(home.getObjectId());
-        user.put("HomeList",homesList);
+//    public void saveHomeToArrayList(ParseUser user, ParseObject home){
+//        ArrayList<String> homesList = (ArrayList) user.getList("HomeList");
+//        homesList.add(home.getObjectId());
+//        user.put("HomeList",homesList);
+//
+//        user.saveInBackground(new SaveCallback() {
+//            @Override
+//            public void done(ParseException e) {
+//                if(e != null){
+//                }
+//                else{
+//                    //subscribeToHomeFCMTopic();
+//                    //populateListView();
+//                }
+//            }
+//        });
+//    }
 
-        user.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if(e != null){
-                }
-                else{
-                    subscribeToHomeFCMTopic();
-                    populateListView();
-                }
-            }
-        });
-    }
-
-    public void subscribeToHomeFCMTopic(){
-        FirebaseMessaging.getInstance().subscribeToTopic("/topics/"+foundHomeObject.getObjectId() + "TOPIC")
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        String msg = "subscribe to home success";
-                        if (!task.isSuccessful()) {
-                            msg = "Subscribe to home failed";
-                            Toast.makeText(getApplicationContext(),"Error occurred...may not receive notifications",Toast.LENGTH_LONG).show();
-                        }
-                        else{
-                            TOPIC = "/topics/"+foundHomeObject.getObjectId() + "TOPIC";
-                            subscribeToPersonalTopic();
-
-                        }
-
-                    }
-                });
-    }
-    public void subscribeToPersonalTopic(){
-        FirebaseMessaging.getInstance().subscribeToTopic("/topics/"+ParseUser.getCurrentUser().getObjectId() + "TOPIC")
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        PERSONALTOPIC = "/topics/"+ParseUser.getCurrentUser().getObjectId() + "TOPIC";
-                        ParseUser.getCurrentUser().put("HOMETOPIC", TOPIC);
-                        ParseUser.getCurrentUser().put("PERSONALTOPIC", PERSONALTOPIC);
-                        ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
-                            @Override
-                            public void done(ParseException e) {
-                                buildJSONMessageObject();
-                            }
-                        });
-                    }
-                });
-    }
+//    public void subscribeToHomeFCMTopic(){
+//        FirebaseMessaging.getInstance().subscribeToTopic("/topics/"+foundHomeObject.getObjectId() + "TOPIC")
+//                .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<Void> task) {
+//                        String msg = "subscribe to home success";
+//                        if (!task.isSuccessful()) {
+//                            msg = "Subscribe to home failed";
+//                            Toast.makeText(getApplicationContext(),"Error occurred...may not receive notifications",Toast.LENGTH_LONG).show();
+//                        }
+//                        else{
+//                            TOPIC = "/topics/"+foundHomeObject.getObjectId() + "TOPIC";
+//                            subscribeToPersonalTopic();
+//
+//                        }
+//
+//                    }
+//                });
+//    }
+//    public void subscribeToPersonalTopic(){
+//        FirebaseMessaging.getInstance().subscribeToTopic("/topics/"+ParseUser.getCurrentUser().getObjectId() + "TOPIC")
+//                .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<Void> task) {
+//                        PERSONALTOPIC = "/topics/"+ParseUser.getCurrentUser().getObjectId() + "TOPIC";
+//                        ParseUser.getCurrentUser().put("HOMETOPIC", TOPIC);
+//                        ParseUser.getCurrentUser().put("PERSONALTOPIC", PERSONALTOPIC);
+//                        ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
+//                            @Override
+//                            public void done(ParseException e) {
+//                                buildJSONMessageObject();
+//                            }
+//                        });
+//                    }
+//                });
+//    }
 
 //    public void loadRegistrationTokens(){
 //        /*
@@ -273,48 +310,48 @@ public class ViewHome extends AppCompatActivity {
     * This object will contain the receiver’s topic, notification title,
     * notification message, and other key/value pairs to add.
     * */
-    public void buildJSONMessageObject(){
-        JSONObject notification = new JSONObject();
-        JSONObject notificationBody = new JSONObject();
-        try {
-            notificationBody.put("title", "New Member");
-            notificationBody.put("message", ParseUser.getCurrentUser().getUsername()+" has joined " + foundHomeObject.get("HomeName"));
-
-            notification.put("to", TOPIC);
-            //notification.put("registration_ids",registrationTokens);
-            notification.put("data", notificationBody);
-        } catch ( JSONException e) {
-        }
-
-        sendNotification(notification);
-    }
+//    public void buildJSONMessageObject(){
+//        JSONObject notification = new JSONObject();
+//        JSONObject notificationBody = new JSONObject();
+//        try {
+//            notificationBody.put("title", "New Member");
+//            notificationBody.put("message", ParseUser.getCurrentUser().getUsername()+" has joined " + foundHomeObject.get("HomeName"));
+//
+//            notification.put("to", TOPIC);
+//            //notification.put("registration_ids",registrationTokens);
+//            notification.put("data", notificationBody);
+//        } catch ( JSONException e) {
+//        }
+//
+//        sendNotification(notification);
+//    }
 
     /*
     *make a network request to FCM server using Volley library,
     *then the server will use the request parameters to route the
     *notification to the targeted device.
     * */
-    public void sendNotification(JSONObject notification){
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(getString(R.string.FCM_API), notification,
-                new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-            }
-        }){
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("Authorization","key="+getString(R.string.server_key));
-                params.put("Content-Type", getString(R.string.content_type));
-                return params;
-            }
-        };
-        MySingleton.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
-    }
+//    public void sendNotification(JSONObject notification){//
+//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(getString(R.string.FCM_API), notification,
+//                new Response.Listener<JSONObject>() {
+//            @Override
+//            public void onResponse(JSONObject response) {
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//            }
+//        }){
+//            @Override
+//            public Map<String, String> getHeaders() throws AuthFailureError {
+//                Map<String, String> params = new HashMap<>();
+//                params.put("Authorization","key="+getString(R.string.server_key));
+//                params.put("Content-Type", getString(R.string.content_type));
+//                return params;
+//            }
+//        };
+//        MySingleton.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
+//    }
 
 
     /*
@@ -351,11 +388,21 @@ public class ViewHome extends AppCompatActivity {
     *Populates the listview in the middle of the screen with the names of the members
     * who currently reside in that home.
     * Also updates the number of members textview
+    *
+    *  Looks like you are querying the user table to see which user's HomeList contains
+    *  this homeObjectId. Then once you have all the users who's homelist contains this object Id,
+    *  you check if each user's username is contained in the homes list of memberNames. if not add.
+    *       -So in short: you getting all members of the home and displaying their names in a list on UI.
+    *                           - Why not just grab all users that are in this home's memberList and display on UI?
+    *                           -BECAUSE DUMBASS WE NEED THE ACTUAL USER OBJECT SO THAT WE CAN EASILY GRAB THE USER'S USERNAME TO DISPLAY ON THE LISTVIEW.
+    *                               IF WE DID IT YOUR SUGGESTED WAY WE WOULD HAVE TO QUERY THE USER TABLE ON EACH MEMBER OBJECT ID JUST TO GET THAT MEMBERS USERNAME!
     * */
     public void populateListView(){
         ListView membersListView = findViewById(R.id.membersListView);
 
         memberNamesAdapter = new ArrayAdapter<String>(this, R.layout.list_layout, R.id.list_content,memberNames);
+
+
 
         ParseQuery<ParseUser> query = ParseUser.getQuery();
         query.whereContains("HomeList", foundHomeObject.getObjectId());
@@ -377,7 +424,6 @@ public class ViewHome extends AppCompatActivity {
         membersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //TODO this is where the code will go that will display the members info when clivked on.
             }
         });
     }

@@ -1,21 +1,20 @@
 package com.cleanspace.healthyhome1;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.DeleteCallback;
@@ -33,6 +32,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
 
 public class TaskInfo extends AppCompatActivity {
 
@@ -51,6 +52,7 @@ public class TaskInfo extends AppCompatActivity {
 
     Intent sentTaskInfo;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,23 +86,25 @@ public class TaskInfo extends AppCompatActivity {
         if(isAssigned){
             ParseQuery<ParseUser> assignedToQuery = ParseUser.getQuery();
             assignedToQuery.whereEqualTo("objectId",sentTaskInfo.getStringExtra("assignedTo"));
+            //noinspection rawtypes
             assignedToQuery.findInBackground(new FindCallback() {
                 @Override
                 public void done(List objects, ParseException e) {
                 }
 
+                @SuppressLint("SetTextI18n")
                 @Override
                 public void done(Object o, Throwable throwable) {
                     if(throwable == null){
                         ArrayList<ParseUser> parseUsersArrayList = (ArrayList<ParseUser>) o;
-                        assignedToObject = (ParseUser) parseUsersArrayList.get(0);
-                        assignedToTextView.setText("assigned to: "+assignedToObject.get("name").toString());
+                        assignedToObject = parseUsersArrayList.get(0);
+                        assignedToTextView.setText("assigned to: "+ Objects.requireNonNull(assignedToObject.get("name")));
 
                         if(sentTaskInfo.getStringExtra("isCompleted").equals("true")){
                             statusTextView.setText("Completed");
                             statusTextView.setTextColor(getColor(R.color.DeepPink));
 
-                            completedByTextView.setText("Completed by "+ assignedToObject.get("name").toString());
+                            completedByTextView.setText("Completed by "+ Objects.requireNonNull(assignedToObject.get("name")));
                         }
                         else if(sentTaskInfo.getStringExtra("isCompleted").equals("false")){
                             statusTextView.setText("Incomplete task");
@@ -176,8 +180,30 @@ public class TaskInfo extends AppCompatActivity {
         });
     }
     public void completeTask(View button){
+
         if(isAssigned){
             if(ParseUser.getCurrentUser().getObjectId().equals(assignedToObject.getObjectId())){
+                if(!task.get("isCompleted").equals(true)){
+                    new AlertDialog.Builder(this).setTitle("Complete Task").setMessage("Are you sure that this task is complete?")
+                            .setPositiveButton("Yea", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    complete();
+                                }
+                            }).setNegativeButton("Not yet..", null).show();
+                }
+                else{
+                    Toast.makeText(getApplicationContext(),"Task already completed!",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+            else{
+                Toast.makeText(getApplicationContext(),"Only the member assigned to this task may mark task completed",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+        else{
+            if(!task.get("isCompleted").equals(true)){
                 new AlertDialog.Builder(this).setTitle("Complete Task").setMessage("Are you sure that this task is complete?")
                         .setPositiveButton("Yea", new DialogInterface.OnClickListener() {
                             @Override
@@ -187,18 +213,9 @@ public class TaskInfo extends AppCompatActivity {
                         }).setNegativeButton("Not yet..", null).show();
             }
             else{
-                Toast.makeText(getApplicationContext(),"Only the member assigned to this task may mark task completed",
+                Toast.makeText(getApplicationContext(),"Task already completed!",
                         Toast.LENGTH_SHORT).show();
             }
-        }
-        else{
-            new AlertDialog.Builder(this).setTitle("Complete Task").setMessage("Are you sure that this task is complete?")
-                    .setPositiveButton("Yea", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            complete();
-                        }
-                    }).setNegativeButton("Not yet..", null).show();
         }
 
     }
@@ -229,7 +246,7 @@ public class TaskInfo extends AppCompatActivity {
         if(isAssigned){
             if(ParseUser.getCurrentUser().getObjectId().equals(assignedToObject.getObjectId())){
                 task.put("isCompleted",true);
-                task.put("completedBy",assignedToObject.getObjectId());
+                task.put("completedBy",ParseUser.getCurrentUser().getObjectId());
                 task.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
@@ -331,11 +348,8 @@ public class TaskInfo extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-            }
-        }){
+                }, error -> {
+                }){
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();

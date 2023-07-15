@@ -1,13 +1,20 @@
 package com.cleanspace.healthyhome1;
 
+import static com.parse.Parse.getApplicationContext;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -29,6 +36,7 @@ import com.parse.SaveCallback;
 import org.json.JSONObject;
 
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,22 +48,165 @@ public class HomeScreen extends AppCompatActivity {
     TextView quoteView, homeNameAndIdTextView;
     BottomNavigationView bottomNavigationView;
     ParseObject selectedHome;
+    String selectedHomeObjectId;
+    String homeName;
+    boolean isNotification = false;
+    boolean isRequest = false;
 
-    Intent retrievedHome;
+    Intent retrievedIntent;
 
     ParseUser user;
+
+    View topLeftButton, topRightButton,bottomLeftButton,bottomRightButton;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
-        retrievedHome = getIntent();
-        generateQuote();
-        setBottomNavListener();
-        retrieveSelectedHome();
+        /*
+        *
+        * */
+
+
         user = ParseUser.getCurrentUser();
         homeNameAndIdTextView = findViewById(R.id.homeNameAndIdTextView);
+        generateQuote();
+        setBottomNavListener();
+
+        if(getIntent() == null){//making sure intent isnt null
+            Log.d("ERROR HomeScreen.java -> Received Intent", "---------------Null!!!-------------------");
+            Toast.makeText(getApplicationContext(),"No intent recieved!",Toast.LENGTH_LONG).show();
+        }else{
+            retrievedIntent = getIntent();
+            Log.d(" HomeScreen.java -> Received Intent", "--------------- RETREIEVED SUCCESSFULLY!!!-------------------");
+            Log.d(" HomeScreen.java.java -> Received Intent:", retrievedIntent.toString() +"--------------");
+            if(retrievedIntent.getStringExtra("HomeObjectID") != null){
+                //to tell if intent sent from notfication or not by checking if '*' at end of string.
+                selectedHomeObjectId = retrievedIntent.getStringExtra("HomeObjectID");
+                logToast(" HomeScreen.java -> Received Intent", retrievedIntent.toString() + "-------------------");
+                logToast(" HomeScreen.java -> Received home object id from intent", retrievedIntent.getStringExtra("HomeObjectID") + "-------------------");
+                if(retrievedIntent.getStringExtra("notification") != null){
+                    isNotification = true;
+                }
+                else if ((retrievedIntent.getStringExtra("Request") != null)) {
+                    isRequest = true;
+                }
+                else
+                {
+                    logToast("HomeScreen.java -> retreiveSelectedHomeObject", "String extra 'notification' was null----------------------");
+
+                }
+                retrieveSelectedHomeObject();
+            }
+            else{
+                logToast(" HomeScreen.java onCreate() -> Received Intent",  "received intent does not contain value for homeobjectid-------------------");
+
+            }
+        }
+
+        topLeftButton = findViewById(R.id.topLeftButton);
+        topRightButton = findViewById(R.id.topRightButton);
+        bottomLeftButton = findViewById(R.id.bottomLeftButton);
+        bottomRightButton = findViewById(R.id.bottomRightButton);
+
+    }
+    public void askToViewTask(){
+        logToast("HomeScreen.java -. askToViewTask()", "called----------------------");
+        new AlertDialog.Builder(this).setTitle("View task").setMessage("Do you want to view task?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent myTasks = new Intent(getApplicationContext(), MyTasks.class);
+                        myTasks.putExtra("HomeObjectID", selectedHomeObjectId);
+                        startActivity(myTasks);
+                    }
+                }).setNegativeButton("No", null).show();
+    }
+    public void askToAcceptOrDenyRequest(){
+        logToast("HomeScreen.java -. askToAcceptOrDenyRequest()", "called----------------------");
+        new AlertDialog.Builder(this).setTitle("Accept member?").setMessage("A user has requested to join your home")
+                .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+//                        addUserToHomeWorkRequest(retrievedIntent.getStringExtra("HomeObjectID"), retrievedIntent.getStringExtra("requestedUserObjectID")
+//                                , retrievedIntent.getStringExtra("topic")
+//                                ,retrievedIntent.getStringExtra("personalTopic"));
+
+                        sendRequestAnswerWorkRequest(retrievedIntent.getStringExtra("HomeObjectID"), retrievedIntent.getStringExtra("requestedUserObjectID")
+                                , retrievedIntent.getStringExtra("topic")
+                                ,retrievedIntent.getStringExtra("personalTopic"), true);
+
+
+                    }
+                }).setNegativeButton("Deny",new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+//                        addUserToHomeWorkRequest(retrievedIntent.getStringExtra("HomeObjectID"), retrievedIntent.getStringExtra("requestedUserObjectID")
+//                                , retrievedIntent.getStringExtra("topic")
+//                                ,retrievedIntent.getStringExtra("personalTopic"));
+
+                        sendRequestAnswerWorkRequest(retrievedIntent.getStringExtra("HomeObjectID"), retrievedIntent.getStringExtra("requestedUserObjectID")
+                                , retrievedIntent.getStringExtra("topic")
+                                ,retrievedIntent.getStringExtra("personalTopic"), false);
+
+
+                    }
+                }).show();
+    }
+    public void sendRequestAnswerWorkRequest(String foundHomeObjectID, String requestedUserObjectID, String topic, String personalTopic, boolean isAccepted){
+        WorkRequest sendRequestAnswerWorkRequest = new OneTimeWorkRequest.Builder(
+                SendRequestAnswerWorker.class).setInputData(new Data.Builder()
+                        .putString("foundHomeObjectID", foundHomeObjectID)
+                        .putString("requestedUserObjectID", requestedUserObjectID)
+                        .putString("topic", topic)
+                        .putString("personalTopic", personalTopic)
+                        .putBoolean("isAccepted", isAccepted)
+                        .build())
+                .build();
+
+        WorkManager.getInstance(getApplicationContext()).enqueue(sendRequestAnswerWorkRequest);
+        logToast("HomeScreen.java -> sendRequestAnswerWorker Enqueued!!!", "----------------------------");
+    }
+    public void addUserToHomeWorkRequest(String foundHomeObjectID, String requestedUserObjectID, String topic, String personalTopic){
+        WorkRequest addUserToHomeWorkRequest = new OneTimeWorkRequest.Builder(
+                AddUserToHomeWorker.class).setInputData(new Data.Builder()
+                        .putString("foundHomeObjectID", foundHomeObjectID)
+                        .putString("requestedUserObjectID", requestedUserObjectID)
+                        .putString("topic", topic)
+                        .putString("personalTopic", personalTopic)
+                        .build())
+                .build();
+
+        WorkManager.getInstance(getApplicationContext()).enqueue(addUserToHomeWorkRequest);
+        logToast("addUserToHomeWorkRequest Enqueued!!!", "----------------------------");
+    }
+//    protected void onResume() {
+//        super.onResume();
+//
+//        if(getIntent() == null){//making sure intent isnt null
+//            Log.d("getIntent: ", "---------------Null!!!-------------------");
+//            Toast.makeText(getApplicationContext(),"No intent recieved!",Toast.LENGTH_LONG).show();
+//        }else{
+//            retrievedHome = getIntent();
+//            Log.d(" HomeScreen.java -> Received Intent", "--------------- RETREIEVED SUCCESSFULLY!!!-------------------");
+//            if(retrievedHome.getStringExtra("HomeObjectID") != null){
+//                selectedHomeObjectId = retrievedHome.getStringExtra("HomeObjectID");
+//                logToast(" HomeScreen.java -> Received Intent", retrievedHome.toString() + "-------------------");
+//                logToast(" HomeScreen.java -> Received home object id from intent", retrievedHome.getStringExtra("HomeObjectID") + "-------------------");
+//            }
+//        }
+//    }
+    public void logToast(String tag, String text){
+        Log.d(tag,text);
+        Toast.makeText(getApplicationContext(), tag + ": " + text, Toast.LENGTH_LONG).show();
+    }
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        // Make sure to call the super method so that the states of our views are saved
+        super.onSaveInstanceState(outState);
+        // Save our own state now
+
     }
 
     /*
@@ -64,8 +215,8 @@ public class HomeScreen extends AppCompatActivity {
     * */
     public void showMembers(View view){
         Intent showMembers = new Intent(getApplicationContext(), ShowMembers.class);
-        showMembers.putExtra("HomeObjectID", selectedHome.getObjectId());
-        showMembers.putExtra("HomeName",selectedHome.get("HomeName").toString());
+        showMembers.putExtra("HomeObjectID", selectedHomeObjectId);
+        showMembers.putExtra("HomeName",homeName);
         startActivity(showMembers);
     }
 
@@ -75,19 +226,19 @@ public class HomeScreen extends AppCompatActivity {
     * */
     public void addTask(View view){
         Intent addTask = new Intent(getApplicationContext(), CreateTask.class);
-        addTask.putExtra("HomeObjectID", selectedHome.getObjectId());
+        addTask.putExtra("HomeObjectID", selectedHomeObjectId);
         startActivity(addTask);
     }
 
     public void myTasks(View view){
         Intent myTasks = new Intent(getApplicationContext(), MyTasks.class);
-        myTasks.putExtra("HomeObjectID", selectedHome.getObjectId());
+        myTasks.putExtra("HomeObjectID", selectedHomeObjectId);
         startActivity(myTasks);
     }
 
     public void allTasks(View view){
         Intent allTasks = new Intent(getApplicationContext(), AllTasks.class);
-        allTasks.putExtra("HomeObjectID", selectedHome.getObjectId());
+        allTasks.putExtra("HomeObjectID", selectedHomeObjectId);
         startActivity(allTasks);
     }
 
@@ -95,10 +246,11 @@ public class HomeScreen extends AppCompatActivity {
     /*
      * uses data sent from intent to search for the clicked home ParseObject to easily get info about the home if necessary
      * assigns the selectedHome ParseObject global variable
+     *
      * */
-    public void retrieveSelectedHome(){
+    public void retrieveSelectedHomeObject(){
         ParseQuery selectedHomeQuery = ParseQuery.getQuery("Homes");
-        selectedHomeQuery.whereEqualTo("objectId", retrievedHome.getStringExtra("HomeObjectID"));
+        selectedHomeQuery.whereEqualTo("objectId", selectedHomeObjectId);
         selectedHomeQuery.getFirstInBackground(new GetCallback() {
             @Override
             public void done(ParseObject object, ParseException e) { }
@@ -109,11 +261,22 @@ public class HomeScreen extends AppCompatActivity {
                     if(o == null){
                     }else{
                         selectedHome = (ParseObject) o;
-                        homeNameAndIdTextView.setText(selectedHome.get("HomeName").toString()+": " + selectedHome.get("ID"));
+                        String homeNameAndIdText = selectedHome.get("HomeName").toString()+": " + selectedHome.get("ID");
+                        homeName = selectedHome.get("HomeName").toString();
+                        homeNameAndIdTextView.setText(homeNameAndIdText);
+                        if(isNotification){
+                            askToViewTask();
+                        } else if (isRequest) {
+                            askToAcceptOrDenyRequest();
+                        }
+                        topLeftButton.setVisibility(View.VISIBLE);
+                        topRightButton.setVisibility(View.VISIBLE);
+                        bottomLeftButton.setVisibility(View.VISIBLE);
+                        bottomRightButton.setVisibility(View.VISIBLE);
                     }
-
                 }
                 else{
+                    logToast("Error HomeScreen.java -> retrieveSelectedHomeObject()","Throwable does not equal null: " + throwable.getLocalizedMessage() + "-----------------");
                 }
             }
         });
@@ -198,6 +361,7 @@ public class HomeScreen extends AppCompatActivity {
             quoteView.setText("Sorry, no quote available..");
         }
     }
+
 }
 /*
 * This class was made for fun to download a random quote from
@@ -232,4 +396,5 @@ class DownloadRandomQuote extends AsyncTask<String, Void, JSONObject>{
         }
         return null;
     }
+
 }

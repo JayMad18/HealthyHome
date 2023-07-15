@@ -59,7 +59,6 @@
         android:layout_height="wrap_content"
         android:background="@drawable/rounded_edit_text"
         android:alpha="0"
-        android:onClick="goNavTest"
         android:text="Nav Test Button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

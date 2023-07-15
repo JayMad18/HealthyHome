@@ -40,7 +40,7 @@ public class CreateMemberActivity extends AppCompatActivity {
     * so that the Array column for that user is not undifined.
     * */
     public void submit(View view){
-        /* TODO submit member profile data to parse server and Log Into Home Dashboard */
+        logToast("SubmitButton","Pressed----------------------");
        if(allTextFieldsFilled()){
            if(passwordMatch()){
                EditText name = findViewById(R.id.nameEditText);
@@ -83,6 +83,7 @@ public class CreateMemberActivity extends AppCompatActivity {
                        } else {
                            // Sign up didn't succeed. Look at the ParseException
                            // to figure out what went wrong
+                           logToast("Submit ERROR:",e.getLocalizedMessage() +  "----------------------");
                        }
                    }
                });
@@ -92,6 +93,10 @@ public class CreateMemberActivity extends AppCompatActivity {
        }
        else{
        }
+    }
+    public void logToast(String tag, String text){
+        Log.d(tag,text);
+        Toast.makeText(getApplicationContext(), tag + ": " + text, Toast.LENGTH_LONG).show();
     }
     //Switches to the MainActivty acticity
     public void goBack(View view){
