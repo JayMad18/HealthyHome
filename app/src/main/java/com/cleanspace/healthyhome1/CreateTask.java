@@ -3,6 +3,7 @@ package com.cleanspace.healthyhome1;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
@@ -343,7 +344,9 @@ public class CreateTask extends AppCompatActivity {
                 if(hourOfDay == 12){
                     hour_of_12_hour_format = 12;
                 }
-                hour_of_12_hour_format = hourOfDay - 12;
+                else {
+                    hour_of_12_hour_format = hourOfDay - 12;
+                }
             }
             else {
                 hour_of_12_hour_format = hourOfDay;
@@ -440,7 +443,11 @@ public class CreateTask extends AppCompatActivity {
     }
 
     public void intervalSelectDialog(){
-        new AlertDialog.Builder(this).setView(R.layout.dialog_repeating).show();
+        //TODO: we need a fragment not an AlertDialog
+        //new AlertDialog.Builder(this).setView(R.layout.dialog_repeating).show();
+        DialogFragment newFragment = new IntervalFragment();
+        newFragment.show(getSupportFragmentManager(), "intervalSelect");
+
     }
 
     public void showTimePickerDialog(View v) {
