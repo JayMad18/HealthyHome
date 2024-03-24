@@ -1,20 +1,11 @@
 package com.cleanspace.healthyhome1;
 
-import static com.parse.Parse.getApplicationContext;
-
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.work.Data;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
-import androidx.work.WorkRequest;
+
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
@@ -22,12 +13,10 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 public class SendNotificationWorker extends Worker {
@@ -88,7 +77,9 @@ public class SendNotificationWorker extends Worker {
             notificationBody.put("taskDetails", taskDetails);
             notificationBody.put("alarmTimeMillis", alarmTimeMillis);
             notificationBody.put("HomeObjectID",homeObjectId);
+            notificationBody.put("topic", TOPIC);
             if(isAssigned){
+                notificationBody.put("personalTopic",PERSONALTOPIC);
                 notification.put("to", PERSONALTOPIC);
             }
             else{

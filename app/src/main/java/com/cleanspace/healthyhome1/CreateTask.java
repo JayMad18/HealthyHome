@@ -3,6 +3,7 @@ package com.cleanspace.healthyhome1;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
@@ -12,6 +13,7 @@ import android.accessibilityservice.AccessibilityService;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Rect;
@@ -43,6 +45,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -52,6 +55,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.TimeZone;
+
 import static java.time.temporal.ChronoUnit.MILLIS;
 
 public class CreateTask extends AppCompatActivity {
@@ -75,12 +80,17 @@ public class CreateTask extends AppCompatActivity {
 
     long dateInMilliseconds;
 
+    Date dateMillis;
+
 
 
     ParseObject homeObject;
     ParseObject task;
     ParseUser user;
     ParseObject assignedMember;
+
+    Calendar c;
+    Calendar setDate;
 
 
     ArrayList<String> registrationTokens = new ArrayList<String>();
@@ -118,10 +128,14 @@ public class CreateTask extends AppCompatActivity {
 
         user = ParseUser.getCurrentUser();
 
+        c = Calendar.getInstance();
+        setDate = Calendar.getInstance();
+
         timeSet = false;
         dateSet = false;
         dateOrTimeSet = false;
         isAssigned = false;
+        isReoccuring = false;
 
 
 
@@ -138,7 +152,6 @@ public class CreateTask extends AppCompatActivity {
                 if(e == null){
                     homeObject = object;
                     task = new ParseObject("Tasks");
-                    isReoccuring = false;
                 }
                 else {
                 }
@@ -163,14 +176,13 @@ public class CreateTask extends AppCompatActivity {
         task.put("Home", selectedHomeObjectId);
         task.put("details",detailsEditText.getText().toString());
 
+        task.put("isReOccuring", isReoccuring);
+        task.put("isAssigned",isAssigned);
+
         if(isAssigned){
             String assignedMemberObjectId = memberObjects.get(position).getObjectId();
-            task.put("isAssigned", true);
             task.put("assignToObjectId", assignedMemberObjectId);
             task.put("assignerObjectId",assignerObjectId);
-        }
-        else{
-            task.put("isAssigned", false);
         }
         task.saveInBackground(new SaveCallback() {
             @Override
@@ -180,44 +192,23 @@ public class CreateTask extends AppCompatActivity {
                    // buildJSONMessageObject(isAssigned);
                     //scheduleTask();
                     notificationWorkRequest();
+                        if(dateOrTimeSet){
+                            task.put("dateToComplete",convertToMilliseconds(setDate, c));
+                            if(isReoccuring){
+                                /*TODO
+                                *  call reAlarmWorkRequest();
+                                *   -uses CreateReOcAlarmWorker Class
+                                * */
+                            }
+                            else{
+                                /*TODO
+                                 *  call alarmWorkRequest();
+                                 *   -uses CreateAlarmWorker Class
+                                 * */
+                            }
+                        }
                     changeActivity(HomeScreen.class);
-
-                    if(isAssigned){//Send notification to that person
-                        /*
-                         * TODO:
-                             *   if(DueDateTime){
-                             *    if(isRepeating){
-                             *          send THAT PERSON an intent to create alarm with intent data about repeating schedule along with notification
-                             *     }
-                             *    else{
-                             *          send THAT PERSON an intent to create alarm along with notification
-                             *     }
-                             *   }
-                             *   else{
-                             *     only send notification to THAT PERSON no intent to create alarm.
-                             *   }
-                         * */
-
                     }
-                    else{//Send notificaiton to everyone
-                        /*
-                        TODO:
-                             *   if(DueDateTime){
-                             *    if(isRepeating){
-                             *          send ALL MEMBERS an intent to create alarm with intent data about repeating schedule along with notification
-                             *     }
-                             *    else{
-                             *          send ALL MEMBERS an intent to create alarm along with notification
-                             *     }
-                             *   }
-                             *   else{
-                             *     only send notification to ALL MEMBERS no intent to create alarm.
-                             *   }
-                        * */
-                    }
-
-
-                }
                 else{
                     logToast("createTask()",e.getLocalizedMessage());
                     taskHasObjectId = false;
@@ -322,7 +313,7 @@ public class CreateTask extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     public void setTime(int hourOfDay, int minute, String status){
-        Calendar c = Calendar.getInstance();
+
 
 
         if(hourOfDay < c.get(Calendar.HOUR_OF_DAY) || (hourOfDay == c.get(Calendar.HOUR_OF_DAY) && minute < c.get(Calendar.MINUTE))){
@@ -334,6 +325,14 @@ public class CreateTask extends AppCompatActivity {
             this.minute = minute;
             this.status = status;
 
+            setDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            setDate.set(Calendar.MINUTE, minute);
+            if(status.equals("AM")){
+                setDate.set(Calendar.AM, 0);
+            } else if (status.equals("PM")) {
+                setDate.set(Calendar.PM, 1);
+            }
+
             // Initialize a new variable to hold 12 hour format hour value
             int hour_of_12_hour_format;
             if(hourOfDay > 11){
@@ -343,7 +342,9 @@ public class CreateTask extends AppCompatActivity {
                 if(hourOfDay == 12){
                     hour_of_12_hour_format = 12;
                 }
-                hour_of_12_hour_format = hourOfDay - 12;
+                else {
+                    hour_of_12_hour_format = hourOfDay - 12;
+                }
             }
             else {
                 hour_of_12_hour_format = hourOfDay;
@@ -360,7 +361,6 @@ public class CreateTask extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     public void setDate(int year, int month, int dayOfMonth){
-        Calendar c = Calendar.getInstance();
 
         if(year <  c.get(Calendar.YEAR) ||
                 (year ==  c.get(Calendar.YEAR) &&  month < c.get(Calendar.MONTH)) ||
@@ -373,27 +373,24 @@ public class CreateTask extends AppCompatActivity {
             this.month = month;
             this.dayOfMonth = dayOfMonth;
 
-            Calendar setDate = Calendar.getInstance();
+
             setDate.set(Calendar.YEAR, year);
             setDate.set(Calendar.MONTH, month);
             setDate.set(Calendar.DAY_OF_MONTH,dayOfMonth);
+            logToast("***CreateTask.java**, setDate()", setDate.toString());
 
             dateTextView.setText(month + 1 + "/" + dayOfMonth + "/" + year);
-            dateInMilliseconds = convertToMilliseconds(setDate, c);
-
-            /*
-            * TODO: convert (date set - today's date) to milliseconds for one time alarm.
-            *
-            *
-            */
 
         }
     }
 
     public long convertToMilliseconds(Calendar setDate, Calendar today){
-        long millis = MILLIS.between((Temporal) setDate, (Temporal) today);
+        long millis = setDate.getTimeInMillis() - today.getTimeInMillis();
+        if(today == setDate){
+            millis = 0;
+        }
         logToast("CreateTask.java -> convertToMilliseconds(): today", today.toString() + "--------------");
-        logToast("CreateTask.java -> convertToMilliseconds(): today", setDate.toString() + "--------------");
+        logToast("CreateTask.java -> convertToMilliseconds(): setDate", setDate.toString() + "--------------");
         logToast("CreateTask.java -> convertToMilliseconds(): Milli seconds between", String.valueOf(millis) + "--------------");
         return millis;
     }
@@ -405,24 +402,15 @@ public class CreateTask extends AppCompatActivity {
     public void askIfRepeating(){
         new AlertDialog.Builder(this).setTitle("Repeat").setMessage("Do you need this task to repeat?")
                 .setPositiveButton("Yes", getRepClickView()).setNegativeButton("No", getOneClickView()).show();
-
-
-        /*
-        * TODO: "ask if repeating" when user clicks "set date", if repeating call interval select dialog then save date and time to database also save isReoccuring to true,
-        *  if not repeating call code that is located within showTimePickerDialog(View v) then save date and time to database also save isReoccuring to true.
-        *
-        *           -Need to send intent data to tell if alarm is reoccuring.
-        *
-        *
-        * */
     }
 
-    public DialogInterface.OnClickListener getOneClickView(){
+    public DialogInterface.OnClickListener getOneClickView(){//actually creates a fragment not a dialog
         DialogInterface.OnClickListener oneTimeClick = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 DialogFragment newFragment = new DatePickerFragment();
                 newFragment.show(getSupportFragmentManager(), "DatePicker");
+                isReoccuring = false;
             }
         };
 
@@ -439,18 +427,24 @@ public class CreateTask extends AppCompatActivity {
         return repeatingClick;
     }
 
-    public void intervalSelectDialog(){
-        new AlertDialog.Builder(this).setView(R.layout.dialog_repeating).show();
+    public void intervalSelectDialog(){//actually creates a fragment not a dialog
+        //TODO: fargment needs to be completed
+        //new AlertDialog.Builder(this).setView(R.layout.dialog_repeating).show();
+        DialogFragment newFragment = new IntervalFragment();
+        newFragment.show(getSupportFragmentManager(), "intervalSelect");
+        isReoccuring = true;
+
     }
 
     public void showTimePickerDialog(View v) {
         DialogFragment newFragment = new TimePickerFragment();
         newFragment.show(getSupportFragmentManager(), "timePicker");
-
+        dateOrTimeSet = true;
     }
 
     public void showDatePickerDialog(View v){
         askIfRepeating();
+        dateOrTimeSet = true;
 
     }
 

@@ -29,7 +29,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //TODO: Offload all processes from activities on to worker threads to increase performance
+        //TODO: Offload all processes from activities on to worker threads to increase performance.
+        //TODO: Store each user's Homes, tasks for that home, and non-trivial info locally via Room persistence so that user can still use app offline.
+        //TODO: May need to generate unique request code for each user's alarm so that user can delete their alarm via (Room persistence)
 
         if(ParseUser.getCurrentSessionToken() != null){
             changeActivity(Homes.class);
@@ -53,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                logToast("Thanks:","Thank you for allowing healthyhome to schedule alarms for you");
+                logToast("Thanks:","Thank you for allowing HealthyHome to schedule alarms for you");
             } else {
                 logToast("IMPORTANT:","HealthyHome will not work properly if it cannot schedule alarms for you");
             }

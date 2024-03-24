@@ -221,6 +221,7 @@ public void createAlarmWorkRequest(String taskName, String taskDetails, long ala
                     .putString("taskName", taskName)
                     .putString("taskDetails", taskDetails)
                     .putLong("alarmTimeMilli", alarmTimeMillis)
+                    //.putLong("type",type)
                     .build())
             .build();
 

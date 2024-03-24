@@ -29,6 +29,7 @@ public class CreateAlarmWorker extends Worker {
     public Result doWork() {
         String taskName = getInputData().getString("taskName");
         String taskDetails = getInputData().getString("taskDetails");
+        String type = getInputData().getString("type");
         long alarmTimeMillis = getInputData().getLong("alarmTimeMillis", 10000);
         /*
         * TODO: use the year,month,dayOfMonth, and time to create new calender instance and set the date and time and pass to alarManager as cal.getTimeInMillis()
@@ -39,6 +40,7 @@ public class CreateAlarmWorker extends Worker {
         Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
         intent.putExtra("taskName", taskName);
         intent.putExtra("taskDetails", taskDetails);
+        intent.putExtra("type",type);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 100, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

@@ -44,8 +44,12 @@ public class AlarmReceiver extends BroadcastReceiver {
 
             String message = intent.getStringExtra("taskDetails");
             String title = intent.getStringExtra("taskName");
-            //int notifId = type.equalsIgnoreCase(TYPE_ONE_TIME) ? ID_ONETIME : 0;
-            int notifId = ID_ONETIME;
+            String type;
+            int notifId = type.equalsIgnoreCase(TYPE_ONE_TIME) ? ID_ONETIME : 0;
+            //int notifId = ID_ONETIME;
+            if(notifId == ID_ONETIME){
+                
+            }
             /*
              * TODO: code is "trying to say"
              *  if(type == TYPE_ONE_TIME "ignore case"){
@@ -114,7 +118,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(timeArray[0]));
         calendar.set(Calendar.MINUTE, Integer.parseInt(timeArray[1]));
         calendar.set(Calendar.SECOND, 0);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, ID_ONETIME, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, ID_ONETIME, intent, PendingIntent.FLAG_IMMUTABLE);
         if (alarmManager != null) {
             alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         }

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".IntervalFragment">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            >
+
+            <LinearLayout
+                android:id="@+id/everyTextView_XEditText_DWMYDropDownListLinearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/everyTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Repeats Every:"
+                    android:textSize="30sp"
+                    android:ems="10"
+                    android:textColor="@color/Pink" />
+
+                <EditText
+                    android:id="@+id/editTextNumber"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="1"
+                    android:ems="10"
+                    android:inputType="number" />
+
+                <RadioGroup
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent" />
+
+
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/intervalSelectLinearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+            </LinearLayout>
+
+            <RadioGroup
+                android:id="@+id/intervalRadioGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:theme="@style/TimePickerTheme"
+                android:orientation="horizontal"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp">
+
+                <RadioButton
+                    android:id="@+id/dayRadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Days" />
+                <RadioButton
+                    android:id="@+id/weekRadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Weeks" />
+                <RadioButton
+                    android:id="@+id/monthRadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Month" />
+                <RadioButton
+                    android:id="@+id/yearRadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Years" />
+            </RadioGroup>
+
+            <LinearLayout
+                android:id="@+id/weekDayRadioButtonsLinearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RadioGroup
+                    android:id="@+id/weekDayRadioGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:theme="@style/TimePickerTheme">
+
+                    <RadioButton
+                        android:id="@+id/sundayRadioButtom"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Sun" />
+
+                    <RadioButton
+                        android:id="@+id/mondayRadioButtom"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Mon" />
+
+                    <RadioButton
+                        android:id="@+id/tuesdayRadioButtom"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Tue" />
+
+                    <RadioButton
+                        android:id="@+id/wednesdayRadioButtom"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Wed" />
+                    <RadioButton
+                        android:id="@+id/thursdayRadioButtom"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Thur" />
+
+                    <RadioButton
+                        android:id="@+id/fridayRadioButtom"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Fri" />
+
+                    <RadioButton
+                        android:id="@+id/saturdayRadioButtom"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Sat" />
+
+                </RadioGroup>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/weekDayRadioButtonsLinearLayoutBottom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/startTextView_DatePickerDialogLinearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/startDayTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="showDatePickerDialog"
+                    android:text="Start on: "
+                    android:visibility="gone"
+                    android:gravity="center"
+                    android:layout_marginTop="30dp"
+                    android:textColor="@color/Pink"
+                    android:textSize="20sp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</FrameLayout>
