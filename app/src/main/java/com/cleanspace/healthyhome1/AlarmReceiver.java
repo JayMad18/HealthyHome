@@ -44,8 +44,12 @@ public class AlarmReceiver extends BroadcastReceiver {
 
             String message = intent.getStringExtra("taskDetails");
             String title = intent.getStringExtra("taskName");
-            //int notifId = type.equalsIgnoreCase(TYPE_ONE_TIME) ? ID_ONETIME : 0;
-            int notifId = ID_ONETIME;
+            String type;
+            int notifId = type.equalsIgnoreCase(TYPE_ONE_TIME) ? ID_ONETIME : 0;
+            //int notifId = ID_ONETIME;
+            if(notifId == ID_ONETIME){
+                
+            }
             /*
              * TODO: code is "trying to say"
              *  if(type == TYPE_ONE_TIME "ignore case"){

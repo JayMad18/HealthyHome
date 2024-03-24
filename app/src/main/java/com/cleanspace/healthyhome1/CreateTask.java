@@ -89,6 +89,9 @@ public class CreateTask extends AppCompatActivity {
     ParseUser user;
     ParseObject assignedMember;
 
+    Calendar c;
+    Calendar setDate;
+
 
     ArrayList<String> registrationTokens = new ArrayList<String>();
     ArrayList<ParseUser> memberObjects = new ArrayList<ParseUser>();
@@ -124,6 +127,9 @@ public class CreateTask extends AppCompatActivity {
         dateTextView = findViewById(R.id.calendarPickerView);
 
         user = ParseUser.getCurrentUser();
+
+        c = Calendar.getInstance();
+        setDate = Calendar.getInstance();
 
         timeSet = false;
         dateSet = false;
@@ -169,7 +175,7 @@ public class CreateTask extends AppCompatActivity {
         task.put("Name", taskNameEditText.getText().toString());
         task.put("Home", selectedHomeObjectId);
         task.put("details",detailsEditText.getText().toString());
-        task.put("dateToComplete",new Date(dateInMilliseconds));
+
         task.put("isReOccuring", isReoccuring);
         task.put("isAssigned",isAssigned);
 
@@ -186,9 +192,8 @@ public class CreateTask extends AppCompatActivity {
                    // buildJSONMessageObject(isAssigned);
                     //scheduleTask();
                     notificationWorkRequest();
-                    changeActivity(HomeScreen.class);
-                    notificationWorkRequest();
                         if(dateOrTimeSet){
+                            task.put("dateToComplete",convertToMilliseconds(setDate, c));
                             if(isReoccuring){
                                 /*TODO
                                 *  call reAlarmWorkRequest();
@@ -202,6 +207,7 @@ public class CreateTask extends AppCompatActivity {
                                  * */
                             }
                         }
+                    changeActivity(HomeScreen.class);
                     }
                 else{
                     logToast("createTask()",e.getLocalizedMessage());
@@ -307,7 +313,7 @@ public class CreateTask extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     public void setTime(int hourOfDay, int minute, String status){
-        Calendar c = Calendar.getInstance();
+
 
 
         if(hourOfDay < c.get(Calendar.HOUR_OF_DAY) || (hourOfDay == c.get(Calendar.HOUR_OF_DAY) && minute < c.get(Calendar.MINUTE))){
@@ -318,6 +324,14 @@ public class CreateTask extends AppCompatActivity {
             this.hourOfDay = hourOfDay;
             this.minute = minute;
             this.status = status;
+
+            setDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            setDate.set(Calendar.MINUTE, minute);
+            if(status.equals("AM")){
+                setDate.set(Calendar.AM, 0);
+            } else if (status.equals("PM")) {
+                setDate.set(Calendar.PM, 1);
+            }
 
             // Initialize a new variable to hold 12 hour format hour value
             int hour_of_12_hour_format;
@@ -347,7 +361,6 @@ public class CreateTask extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     public void setDate(int year, int month, int dayOfMonth){
-        Calendar c = Calendar.getInstance();
 
         if(year <  c.get(Calendar.YEAR) ||
                 (year ==  c.get(Calendar.YEAR) &&  month < c.get(Calendar.MONTH)) ||
@@ -360,13 +373,14 @@ public class CreateTask extends AppCompatActivity {
             this.month = month;
             this.dayOfMonth = dayOfMonth;
 
-            Calendar setDate = Calendar.getInstance();
+
             setDate.set(Calendar.YEAR, year);
             setDate.set(Calendar.MONTH, month);
             setDate.set(Calendar.DAY_OF_MONTH,dayOfMonth);
+            logToast("***CreateTask.java**, setDate()", setDate.toString());
 
             dateTextView.setText(month + 1 + "/" + dayOfMonth + "/" + year);
-            dateInMilliseconds = convertToMilliseconds(setDate, c);
+
         }
     }
 
